@@ -142,6 +142,14 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .cmp-btn { width:100%; height:36px; border-radius:var(--rmd); border:0.5px solid var(--border-med); background:var(--bg); color:var(--text2); font-size:13px; font-family:inherit; cursor:pointer; margin-top:8px; transition:all 0.2s; }
 .cmp-btn.on { background:linear-gradient(135deg,var(--gbg),var(--amberbg)); color:var(--text); border-color:rgba(22,163,74,0.25); font-weight:600; }
 .rhead.a { background:var(--amberbg); } .rname.a { color:var(--ambertxt); } .rbadge.rba { background:var(--amber); }
+.ext-btn { display:none; width:100%; height:50px; border-radius:var(--rmd); border:none; background:linear-gradient(135deg,#d97706,#b45309); color:#fff; font-size:15px; font-weight:700; font-family:inherit; cursor:pointer; margin-bottom:12px; letter-spacing:0.01em; transition:opacity 0.15s,transform 0.1s; box-shadow:0 2px 8px rgba(180,83,9,0.25); }
+.ext-btn.on { display:block; }
+.ext-btn:active { opacity:0.85; transform:scale(0.98); }
+.ext-btn:disabled { opacity:0.45; }
+.rhead.gold { background:linear-gradient(135deg,#fef3c7,#fde68a); border-bottom:0.5px solid rgba(180,83,9,0.2); }
+.rname.gold { color:#92400e; }
+.rbadge.rbgold { background:linear-gradient(135deg,#d97706,#b45309); }
+.grphead.gold { color:#92400e; background:linear-gradient(135deg,#fef3c7,#fde68a); }
 </style>
 </head>
 <body>
@@ -297,6 +305,16 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
   <div class="rbody" id="rbBc"></div>
 </div>
 
+<button class="ext-btn" id="extBtn" onclick="doExtract()">🏆 Kombinierten Extrakt erstellen &middot; Premium</button>
+
+<div class="rcard" id="rcExt">
+  <div class="rhead gold">
+    <div class="rname gold" id="rnExt"></div>
+    <div class="rbadge rbgold">🏆 Premium-Extrakt <span class="rprovider">· KI-Synthese</span></div>
+  </div>
+  <div class="rbody" id="rbExt"></div>
+</div>
+
 <button class="btnnew" id="btnnew" onclick="reset()">Neue Suche</button>
 
 <div class="disc">
@@ -309,6 +327,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 var mode = 's';
 var provider = 'gemini';
 var compareMode = false;
+var lastGeminiResult = '', lastClaudeResult = '', lastQuery = '', lastExtMode = '';
 
 // ── Prompts ──────────────────────────────────────────────────────────────────
 
@@ -368,9 +387,11 @@ function setMode(m) {
 }
 
 function reset() {
-  ['rcS','rcB','rcSc','rcBc','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  ['rcS','rcB','rcSc','rcBc','rcExt','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  document.getElementById('extBtn').classList.remove('on');
   document.getElementById('sinp').value = '';
   document.getElementById('binp').value = '';
+  lastGeminiResult = ''; lastClaudeResult = ''; lastQuery = ''; lastExtMode = '';
   window.scrollTo(0,0);
 }
 
@@ -588,11 +609,12 @@ async function doSupplement() {
         callClaude(SYS_S, 'Nahrungsergaenzungsmittel: ' + v)
       ]);
       var rG = settled[0], rC = settled[1];
-      if (rG.status === 'fulfilled') renderS(v, rG.value, 'Gemini');
-      if (rC.status === 'fulfilled') renderSc(v, rC.value);
+      if (rG.status === 'fulfilled') { renderS(v, rG.value, 'Gemini'); lastGeminiResult = rG.value; }
+      if (rC.status === 'fulfilled') { renderSc(v, rC.value); lastClaudeResult = rC.value; }
       if (rG.status === 'rejected' && rC.status === 'rejected') { handleError(rG.reason); return; }
       if (rG.status === 'rejected') showErr('Gemini: ' + rG.reason.message, 'warn');
       if (rC.status === 'rejected') showErr('Claude: ' + rC.reason.message, 'warn');
+      if (lastGeminiResult && lastClaudeResult) { lastQuery = v; lastExtMode = 's'; document.getElementById('extBtn').classList.add('on'); }
     } else {
       var t = await callAPI(SYS_S, 'Nahrungsergaenzungsmittel: ' + v);
       renderS(v, t);
@@ -616,11 +638,12 @@ async function doSymptom() {
         callClaude(SYS_B, 'Meine Beschwerden: ' + v)
       ]);
       var rG = settled[0], rC = settled[1];
-      if (rG.status === 'fulfilled') renderB(v, rG.value, 'Gemini');
-      if (rC.status === 'fulfilled') renderBc(v, rC.value);
+      if (rG.status === 'fulfilled') { renderB(v, rG.value, 'Gemini'); lastGeminiResult = rG.value; }
+      if (rC.status === 'fulfilled') { renderBc(v, rC.value); lastClaudeResult = rC.value; }
       if (rG.status === 'rejected' && rC.status === 'rejected') { handleError(rG.reason); return; }
       if (rG.status === 'rejected') showErr('Gemini: ' + rG.reason.message, 'warn');
       if (rC.status === 'rejected') showErr('Claude: ' + rC.reason.message, 'warn');
+      if (lastGeminiResult && lastClaudeResult) { lastQuery = v; lastExtMode = 'b'; document.getElementById('extBtn').classList.add('on'); }
     } else {
       var t = await callAPI(SYS_B, 'Meine Beschwerden: ' + v);
       renderB(v, t);
@@ -629,6 +652,47 @@ async function doSymptom() {
     setTimeout(function(){ document.getElementById('rcB').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
   } catch(e) { handleError(e); }
   finally { stopLoad(); document.getElementById('bbtn').disabled = false; }
+}
+
+// ── Premium Extrakt ───────────────────────────────────────────────────────────
+
+function renderExtract(name, text) {
+  var map = lastExtMode === 's' ? SS : SB;
+  var secs = parseSec(text, map), h = '';
+  for (var i = 0; i < secs.length; i++) {
+    var s = secs[i];
+    if (i > 0) h += '<div class="div"></div>';
+    if (s.k === 'NEM') {
+      h += '<div class="grphead gold">&#x1F4CA; Supplements &amp; Naturprodukte</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+    } else if (s.k === 'HOM') {
+      h += '<div class="grphead gold">&#x2697;&#xFE0F; Homoeopathische Mittel</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+    } else {
+      h += '<div class="rsec"><div class="rstitle">'+s.t+'</div><div class="rscontent">'+fmt(s.c)+'</div></div>';
+    }
+  }
+  document.getElementById('rnExt').textContent = name;
+  document.getElementById('rbExt').innerHTML = h || '<div class="rscontent">'+fmt(text)+'</div>';
+  document.getElementById('rcExt').classList.add('on');
+}
+
+async function doExtract() {
+  if (!lastGeminiResult || !lastClaudeResult) return;
+  var btn = document.getElementById('extBtn');
+  btn.disabled = true;
+  var sys = (lastExtMode === 's' ? SYS_S : SYS_B) + '\n\nDu erhältst zwei Expertenantworten verschiedener KI-Systeme zur selben Frage. Erstelle einen optimalen kombinierten Extrakt: Behalte die genauesten und vollständigsten Informationen aus beiden, ergänze fehlende wichtige Details, entferne Wiederholungen. Nutze exakt dieselbe Struktur mit denselben ###TRENNZEICHEN###.';
+  var msg = 'Frage: "' + lastQuery + '"\n\n=== Antwort 1 (Gemini) ===\n' + lastGeminiResult + '\n\n=== Antwort 2 (Claude) ===\n' + lastClaudeResult;
+  document.getElementById('ltxt').textContent = 'Erstelle Premium-Extrakt...';
+  document.getElementById('lprov').textContent = 'via Claude · Synthese beider KIs';
+  document.getElementById('loader').classList.add('on');
+  document.getElementById('rcExt').classList.remove('on');
+  var dots = document.getElementById('ldots').children;
+  for (var i = 0; i < dots.length; i++) dots[i].className = 'dot da';
+  try {
+    var t = await callClaude(sys, msg);
+    renderExtract(lastQuery, t);
+    setTimeout(function(){ document.getElementById('rcExt').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
+  } catch(e) { handleError(e); }
+  finally { document.getElementById('loader').classList.remove('on'); btn.disabled = false; }
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
