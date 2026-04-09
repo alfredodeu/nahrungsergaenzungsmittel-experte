@@ -139,6 +139,9 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .btnnew { display:none; width:100%; height:44px; border-radius:var(--rmd); border:0.5px solid var(--border-med); background:var(--surface); color:var(--text2); font-size:14px; font-family:inherit; cursor:pointer; margin-bottom:12px; }
 .btnnew.on { display:block; }
 .disc { font-size:11px; color:var(--text3); text-align:center; line-height:1.6; padding:4px 1rem 16px; }
+.cmp-btn { width:100%; height:36px; border-radius:var(--rmd); border:0.5px solid var(--border-med); background:var(--bg); color:var(--text2); font-size:13px; font-family:inherit; cursor:pointer; margin-top:8px; transition:all 0.2s; }
+.cmp-btn.on { background:linear-gradient(135deg,var(--gbg),var(--amberbg)); color:var(--text); border-color:rgba(22,163,74,0.25); font-weight:600; }
+.rhead.a { background:var(--amberbg); } .rname.a { color:var(--ambertxt); } .rbadge.rba { background:var(--amber); }
 </style>
 </head>
 <body>
@@ -165,6 +168,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
       <span class="api-badge-pro">PREMIUM</span>
     </button>
   </div>
+  <button class="cmp-btn" id="btnCmp" onclick="toggleCompare()">⚖️ KI-Vergleich: Gemini vs. Claude</button>
   <div id="geminiKeyPanel">
     <div class="key-row">
       <label>API Key:</label>
@@ -277,6 +281,22 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
   <div class="rbody" id="rbB"></div>
 </div>
 
+<div class="rcard" id="rcSc">
+  <div class="rhead a">
+    <div class="rname a" id="rnSc"></div>
+    <div class="rbadge rba">Experten-Info <span class="rprovider">· Claude</span></div>
+  </div>
+  <div class="rbody" id="rbSc"></div>
+</div>
+
+<div class="rcard" id="rcBc">
+  <div class="rhead a">
+    <div class="rname a" id="rnBc"></div>
+    <div class="rbadge rba">Empfehlungen <span class="rprovider">· Claude</span></div>
+  </div>
+  <div class="rbody" id="rbBc"></div>
+</div>
+
 <button class="btnnew" id="btnnew" onclick="reset()">Neue Suche</button>
 
 <div class="disc">
@@ -288,6 +308,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 <script>
 var mode = 's';
 var provider = 'gemini';
+var compareMode = false;
 
 // ── Prompts ──────────────────────────────────────────────────────────────────
 
@@ -326,8 +347,10 @@ function setProvider(p) {
   provider = p;
   document.getElementById('btnGemini').className = p === 'gemini' ? 'api-btn sel-gemini' : 'api-btn';
   document.getElementById('btnClaude').className = p === 'claude' ? 'api-btn sel-claude' : 'api-btn';
-  document.getElementById('geminiKeyPanel').classList.toggle('hidden', p !== 'gemini');
-  document.getElementById('claudeKeyPanel').classList.toggle('hidden', p !== 'claude');
+  if (!compareMode) {
+    document.getElementById('geminiKeyPanel').classList.toggle('hidden', p !== 'gemini');
+    document.getElementById('claudeKeyPanel').classList.toggle('hidden', p !== 'claude');
+  }
   var dots = document.getElementById('ldots').children;
   var cls = p === 'claude' ? 'dot da' : (mode === 'b' ? 'dot dp' : 'dot dg');
   for (var i = 0; i < dots.length; i++) dots[i].className = cls;
@@ -345,10 +368,23 @@ function setMode(m) {
 }
 
 function reset() {
-  ['rcS','rcB','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  ['rcS','rcB','rcSc','rcBc','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
   document.getElementById('sinp').value = '';
   document.getElementById('binp').value = '';
   window.scrollTo(0,0);
+}
+
+function toggleCompare() {
+  compareMode = !compareMode;
+  document.getElementById('btnCmp').classList.toggle('on', compareMode);
+  if (compareMode) {
+    document.getElementById('geminiKeyPanel').classList.remove('hidden');
+    document.getElementById('claudeKeyPanel').classList.remove('hidden');
+  } else {
+    document.getElementById('geminiKeyPanel').classList.toggle('hidden', provider !== 'gemini');
+    document.getElementById('claudeKeyPanel').classList.toggle('hidden', provider !== 'claude');
+  }
+  reset();
 }
 
 function qs(n) { document.getElementById('sinp').value = n; doSupplement(); }
@@ -435,19 +471,30 @@ function fmt(t) {
     .replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1">$1</a>');
 }
 
-function renderS(name, text) {
+function renderS(name, text, provLabel) {
   var secs = parseSec(text, SS), h = '';
   for (var i = 0; i < secs.length; i++) {
     if (i > 0) h += '<div class="div"></div>';
     h += '<div class="rsec"><div class="rstitle">'+secs[i].t+'</div><div class="rscontent">'+fmt(secs[i].c)+'</div></div>';
   }
   document.getElementById('rnS').textContent = name;
-  document.getElementById('rpS').textContent = '· ' + providerLabel();
+  document.getElementById('rpS').textContent = '· ' + (provLabel || providerLabel());
   document.getElementById('rbS').innerHTML = h || '<div class="rscontent">'+fmt(text)+'</div>';
   document.getElementById('rcS').classList.add('on');
 }
 
-function renderB(complaint, text) {
+function renderSc(name, text) {
+  var secs = parseSec(text, SS), h = '';
+  for (var i = 0; i < secs.length; i++) {
+    if (i > 0) h += '<div class="div"></div>';
+    h += '<div class="rsec"><div class="rstitle">'+secs[i].t+'</div><div class="rscontent">'+fmt(secs[i].c)+'</div></div>';
+  }
+  document.getElementById('rnSc').textContent = name;
+  document.getElementById('rbSc').innerHTML = h || '<div class="rscontent">'+fmt(text)+'</div>';
+  document.getElementById('rcSc').classList.add('on');
+}
+
+function renderB(complaint, text, provLabel) {
   var secs = parseSec(text, SB), h = '';
   for (var i = 0; i < secs.length; i++) {
     var s = secs[i];
@@ -461,21 +508,44 @@ function renderB(complaint, text) {
     }
   }
   document.getElementById('rnB').textContent = complaint;
-  document.getElementById('rpB').textContent = '· ' + providerLabel();
+  document.getElementById('rpB').textContent = '· ' + (provLabel || providerLabel());
   document.getElementById('rbB').innerHTML = h || '<div class="rscontent">'+fmt(text)+'</div>';
   document.getElementById('rcB').classList.add('on');
+}
+
+function renderBc(complaint, text) {
+  var secs = parseSec(text, SB), h = '';
+  for (var i = 0; i < secs.length; i++) {
+    var s = secs[i];
+    if (i > 0) h += '<div class="div"></div>';
+    if (s.k === 'NEM') {
+      h += '<div class="grphead" style="color:var(--ambertxt);background:var(--amberbg);">&#x1F4CA; Supplements &amp; Naturprodukte</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+    } else if (s.k === 'HOM') {
+      h += '<div class="grphead" style="color:var(--ambertxt);background:var(--amberbg);">&#x2697;&#xFE0F; Homoeopathische Mittel</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+    } else {
+      h += '<div class="rsec"><div class="rstitle">'+s.t+'</div><div class="rscontent">'+fmt(s.c)+'</div></div>';
+    }
+  }
+  document.getElementById('rnBc').textContent = complaint;
+  document.getElementById('rbBc').innerHTML = h || '<div class="rscontent">'+fmt(text)+'</div>';
+  document.getElementById('rcBc').classList.add('on');
 }
 
 // ── UI Helpers ────────────────────────────────────────────────────────────────
 
 function startLoad(txt) {
-  document.getElementById('ltxt').textContent = txt;
-  document.getElementById('lprov').textContent = 'via ' + providerLabel();
+  document.getElementById('ltxt').textContent = compareMode ? txt + ' (Gemini + Claude)' : txt;
+  document.getElementById('lprov').textContent = compareMode ? 'via Gemini & Claude parallel' : ('via ' + providerLabel());
   document.getElementById('loader').classList.add('on');
-  ['rcS','rcB','errc','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
-  var dotClass = provider === 'claude' ? 'dot da' : (mode === 'b' ? 'dot dp' : 'dot dg');
+  ['rcS','rcB','rcSc','rcBc','errc','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
   var dots = document.getElementById('ldots').children;
-  for (var i = 0; i < dots.length; i++) dots[i].className = dotClass;
+  if (compareMode) {
+    var cls = ['dot dg','dot da','dot dg'];
+    for (var i = 0; i < dots.length; i++) dots[i].className = cls[i];
+  } else {
+    var dotClass = provider === 'claude' ? 'dot da' : (mode === 'b' ? 'dot dp' : 'dot dg');
+    for (var i = 0; i < dots.length; i++) dots[i].className = dotClass;
+  }
 }
 function stopLoad() { document.getElementById('loader').classList.remove('on'); }
 
@@ -512,8 +582,21 @@ async function doSupplement() {
   document.getElementById('sbtn').disabled = true;
   startLoad('Analysiere ' + v + '...');
   try {
-    var t = await callAPI(SYS_S, 'Nahrungsergaenzungsmittel: ' + v);
-    renderS(v, t);
+    if (compareMode) {
+      var settled = await Promise.allSettled([
+        callGemini(SYS_S, 'Nahrungsergaenzungsmittel: ' + v),
+        callClaude(SYS_S, 'Nahrungsergaenzungsmittel: ' + v)
+      ]);
+      var rG = settled[0], rC = settled[1];
+      if (rG.status === 'fulfilled') renderS(v, rG.value, 'Gemini');
+      if (rC.status === 'fulfilled') renderSc(v, rC.value);
+      if (rG.status === 'rejected' && rC.status === 'rejected') { handleError(rG.reason); return; }
+      if (rG.status === 'rejected') showErr('Gemini: ' + rG.reason.message, 'warn');
+      if (rC.status === 'rejected') showErr('Claude: ' + rC.reason.message, 'warn');
+    } else {
+      var t = await callAPI(SYS_S, 'Nahrungsergaenzungsmittel: ' + v);
+      renderS(v, t);
+    }
     document.getElementById('btnnew').classList.add('on');
     setTimeout(function(){ document.getElementById('rcS').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
   } catch(e) { handleError(e); }
@@ -527,8 +610,21 @@ async function doSymptom() {
   document.getElementById('bbtn').disabled = true;
   startLoad('Suche Empfehlungen...');
   try {
-    var t = await callAPI(SYS_B, 'Meine Beschwerden: ' + v);
-    renderB(v, t);
+    if (compareMode) {
+      var settled = await Promise.allSettled([
+        callGemini(SYS_B, 'Meine Beschwerden: ' + v),
+        callClaude(SYS_B, 'Meine Beschwerden: ' + v)
+      ]);
+      var rG = settled[0], rC = settled[1];
+      if (rG.status === 'fulfilled') renderB(v, rG.value, 'Gemini');
+      if (rC.status === 'fulfilled') renderBc(v, rC.value);
+      if (rG.status === 'rejected' && rC.status === 'rejected') { handleError(rG.reason); return; }
+      if (rG.status === 'rejected') showErr('Gemini: ' + rG.reason.message, 'warn');
+      if (rC.status === 'rejected') showErr('Claude: ' + rC.reason.message, 'warn');
+    } else {
+      var t = await callAPI(SYS_B, 'Meine Beschwerden: ' + v);
+      renderB(v, t);
+    }
     document.getElementById('btnnew').classList.add('on');
     setTimeout(function(){ document.getElementById('rcB').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
   } catch(e) { handleError(e); }
