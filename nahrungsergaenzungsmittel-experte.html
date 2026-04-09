@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="NEM Experte">
+<meta name="apple-mobile-web-app-title" content="Ganzheitsmedizin">
 <meta name="theme-color" content="#ffffff">
-<title>NEM Experte</title>
+<title>Ganzheitsmedizin Experte</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -148,8 +148,8 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
   <div class="app-icon">
     <svg viewBox="0 0 30 30" fill="none"><rect x="12.5" y="2" width="5" height="26" rx="2.5" fill="#16a34a"/><rect x="2" y="12.5" width="26" height="5" rx="2.5" fill="#7c3aed"/></svg>
   </div>
-  <h1>NEM Experte</h1>
-  <p>Supplements &amp; Naturheilkunde</p>
+  <h1>Ganzheitsmedizin Experte</h1>
+  <p>Supplements, Homöopathie &amp; Naturheilkunde</p>
 </div>
 
 <!-- API Provider Selector -->
@@ -187,7 +187,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 
 <!-- Mode Toggle -->
 <div class="toggle">
-  <button class="tbtn ag" id="btnS" onclick="setMode('s')">&#x1F4CA; Supplement-Info</button>
+  <button class="tbtn ag" id="btnS" onclick="setMode('s')">&#x1F48A; Mittel-Info</button>
   <button class="tbtn" id="btnB" onclick="setMode('b')">&#x1F50D; Beschwerde-Suche</button>
 </div>
 
@@ -195,7 +195,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 <div id="panelS">
   <div class="card">
     <div class="irow">
-      <input type="text" id="sinp" placeholder="z.B. Magnesium, Vitamin D..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"/>
+      <input type="text" id="sinp" placeholder="z.B. Magnesium, Arnica C30, Vitamin D..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"/>
       <button class="btn bg bi" id="sbtn" onclick="doSupplement()">Suchen</button>
     </div>
     <div class="slabel">Schnellauswahl</div>
@@ -210,6 +210,15 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
       <button class="chip cg" onclick="qs('Coenzym Q10')">Q10</button>
       <button class="chip cg" onclick="qs('Eisen')">Eisen</button>
       <button class="chip cg" onclick="qs('Melatonin')">Melatonin</button>
+      <div class="slabel" style="width:100%;margin-top:10px;margin-bottom:2px">Homöopathie</div>
+      <button class="chip cg" onclick="qs('Arnica montana C30')">Arnica C30</button>
+      <button class="chip cg" onclick="qs('Belladonna C30')">Belladonna C30</button>
+      <button class="chip cg" onclick="qs('Nux vomica C30')">Nux vomica C30</button>
+      <button class="chip cg" onclick="qs('Chamomilla C30')">Chamomilla C30</button>
+      <button class="chip cg" onclick="qs('Apis mellifica C30')">Apis C30</button>
+      <button class="chip cg" onclick="qs('Bryonia C30')">Bryonia C30</button>
+      <button class="chip cg" onclick="qs('Rhus toxicodendron C30')">Rhus tox C30</button>
+      <button class="chip cg" onclick="qs('Pulsatilla C30')">Pulsatilla C30</button>
     </div>
   </div>
 </div>
@@ -282,7 +291,7 @@ var provider = 'gemini';
 
 // ── Prompts ──────────────────────────────────────────────────────────────────
 
-var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin mit Fokus auf Nahrungsergaenzungsmittel.\n\nGib strukturierte Informationen mit exakt diesen Trennzeichen:\n\n###EG###\n[Grobes Einsatzgebiet]\n\n###AW###\n[Spezieller Anwendungsbereich]\n\n###EI###\n[Einnahmeempfehlungen]\n\n###DO###\n[Dosierungshinweise]\n\n###DA###\n[Dauereinnahme empfehlenswert? Begruendung]\n\n###KQ###\n[Bezugsquellen: Apotheke, Amazon, Reformhaus, Online-Shops]\n\n###KO###\n[Gute Kombinationen mit anderen Mitteln und Erklarung]\n\nAuf Deutsch, klar und praxisnah.';
+var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungsergaenzungsmittel und Homoeopathie.\n\nWenn nach einem homoeopathischen Mittel gefragt wird (z.B. Arnica, Belladonna, Nux vomica, Potenzangabe wie C30), gib homoeopathische Informationen. Bei Nahrungsergaenzungsmitteln (z.B. Magnesium, Vitamin D) gib NEM-Informationen. Passe die Abschnitte entsprechend an.\n\nGib strukturierte Informationen mit exakt diesen Trennzeichen:\n\n###EG###\n[Grobes Einsatzgebiet / Wofuer wird es verwendet]\n\n###AW###\n[Spezieller Anwendungsbereich / Typisches Anwendungsbild]\n\n###EI###\n[Einnahmeempfehlungen / Einnahmehinweise]\n\n###DO###\n[Dosierungshinweise / Potenz und Einnahmefrequenz bei Homoeopathie]\n\n###DA###\n[Dauereinnahme oder Kureinnahme empfehlenswert? Begruendung]\n\n###KQ###\n[Bezugsquellen: Apotheke, Reformhaus, Online-Shops]\n\n###KO###\n[Gute Kombinationen mit anderen Mitteln und Erklarung]\n\nAuf Deutsch, klar und praxisnah.';
 
 var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde und Homoeopathie.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
 
