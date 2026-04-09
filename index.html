@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ganzheitsmedizin">
+<meta name="theme-color" content="#ffffff">
+<title>Ganzheitsmedizin Experte</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg:#f5f5f3; --surface:#fff; --border:rgba(0,0,0,0.1); --border-med:rgba(0,0,0,0.18);
+  --text:#1a1a1a; --text2:#5a5a5a; --text3:#9a9a9a;
+  --green:#16a34a; --gbg:#f0fdf4; --gtxt:#15803d; --glight:rgba(22,163,74,0.12);
+  --purple:#7c3aed; --pbg:#f5f3ff; --ptxt:#6d28d9; --plight:rgba(124,58,237,0.12);
+  --amber:#d97706; --amberbg:#fffbeb; --ambertxt:#92400e;
+  --blue:#2563eb; --bluebg:#eff6ff; --bluetxt:#1d4ed8;
+  --redbg:#fef2f2; --redtxt:#dc2626;
+  --rmd:10px; --rlg:14px; --rxl:18px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#0f0f0f; --surface:#1c1c1e; --border:rgba(255,255,255,0.1); --border-med:rgba(255,255,255,0.2);
+    --text:#f0f0f0; --text2:#a0a0a0; --text3:#555;
+    --green:#4ade80; --gbg:#052e16; --gtxt:#86efac; --glight:rgba(74,222,128,0.12);
+    --purple:#a78bfa; --pbg:#2e1065; --ptxt:#c4b5fd; --plight:rgba(167,139,250,0.12);
+    --amber:#fbbf24; --amberbg:#2d1a00; --ambertxt:#fcd34d;
+    --blue:#60a5fa; --bluebg:#1e3a5f; --bluetxt:#93c5fd;
+    --redbg:#2d0a0a; --redtxt:#f87171;
+  }
+}
+html,body { height:100%; font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif; background:var(--bg); color:var(--text); }
+.app { max-width:640px; margin:0 auto; padding:max(env(safe-area-inset-top),16px) 16px max(env(safe-area-inset-bottom),24px); min-height:100vh; }
+
+.header { text-align:center; padding:18px 0 14px; }
+.app-icon { width:58px; height:58px; border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 11px; border:0.5px solid var(--border); background:linear-gradient(135deg,var(--gbg),var(--pbg)); }
+.app-icon svg { width:29px; height:29px; }
+.header h1 { font-size:20px; font-weight:700; letter-spacing:-0.4px; margin-bottom:3px; }
+.header p { font-size:13px; color:var(--text2); }
+
+/* API Provider Selector */
+.api-selector { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--rxl); padding:12px 14px; margin-bottom:12px; }
+.api-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text3); margin-bottom:8px; }
+.api-btns { display:flex; gap:6px; margin-bottom:10px; }
+.api-btn { flex:1; height:42px; border-radius:var(--rlg); border:0.5px solid var(--border-med); background:var(--bg); color:var(--text2); font-size:13px; font-weight:500; font-family:inherit; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:5px; }
+.api-btn.sel-gemini { background:var(--gbg); color:var(--gtxt); border-color:rgba(22,163,74,0.3); }
+.api-btn.sel-claude { background:var(--amberbg); color:var(--ambertxt); border-color:rgba(217,119,6,0.3); }
+.api-badge-free { font-size:10px; font-weight:700; background:var(--green); color:#fff; padding:2px 5px; border-radius:4px; }
+.api-badge-pro { font-size:10px; font-weight:700; background:var(--amber); color:#fff; padding:2px 5px; border-radius:4px; }
+
+.key-row { display:flex; gap:6px; align-items:center; }
+.key-row label { font-size:12px; color:var(--text3); white-space:nowrap; }
+.key-row input { flex:1; height:36px; border-radius:var(--rmd); border:0.5px solid var(--border-med); padding:0 10px; font-size:13px; font-family:inherit; background:var(--bg); color:var(--text); outline:none; -webkit-appearance:none; }
+.key-row input:focus { border-color:var(--green); box-shadow:0 0 0 2px var(--glight); }
+.key-row input.claude-key:focus { border-color:var(--amber); box-shadow:0 0 0 2px rgba(217,119,6,0.12); }
+.key-row .key-link { font-size:11px; color:var(--blue); white-space:nowrap; text-decoration:none; }
+.key-hint { font-size:11px; color:var(--text3); margin-top:6px; line-height:1.5; }
+.key-hint a { color:var(--blue); }
+.key-saved { font-size:11px; color:var(--gtxt); margin-top:5px; display:none; }
+.key-saved.on { display:block; }
+
+/* Mode Toggle */
+.toggle { display:flex; background:var(--surface); border:0.5px solid var(--border); border-radius:var(--rxl); padding:4px; margin-bottom:12px; gap:4px; }
+.tbtn { flex:1; height:40px; border-radius:var(--rlg); border:none; background:transparent; color:var(--text2); font-size:14px; font-weight:500; font-family:inherit; cursor:pointer; transition:all 0.2s; }
+.tbtn.ag { background:var(--gbg); color:var(--gtxt); border:0.5px solid rgba(22,163,74,0.25); }
+.tbtn.ap { background:var(--pbg); color:var(--ptxt); border:0.5px solid rgba(124,58,237,0.25); }
+
+.card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--rxl); padding:14px; margin-bottom:12px; }
+.slabel { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text3); margin-bottom:8px; }
+
+.irow { display:flex; gap:8px; margin-bottom:12px; }
+.irow input { flex:1; height:46px; border-radius:var(--rmd); border:0.5px solid var(--border-med); padding:0 14px; font-size:16px; font-family:inherit; background:var(--bg); color:var(--text); outline:none; -webkit-appearance:none; }
+.irow input:focus { border-color:var(--green); box-shadow:0 0 0 3px var(--glight); }
+
+textarea.sinput { width:100%; height:80px; border-radius:var(--rmd); border:0.5px solid var(--border-med); padding:12px 14px; font-size:16px; font-family:inherit; background:var(--bg); color:var(--text); outline:none; resize:none; display:block; margin-bottom:10px; line-height:1.5; -webkit-appearance:none; }
+textarea.sinput:focus { border-color:var(--purple); box-shadow:0 0 0 3px var(--plight); }
+input::placeholder,textarea::placeholder { color:var(--text3); }
+
+.btn { height:46px; border-radius:var(--rmd); border:none; color:#fff; font-size:15px; font-weight:600; font-family:inherit; cursor:pointer; -webkit-appearance:none; transition:opacity 0.15s,transform 0.1s; }
+.btn:active { opacity:0.82; transform:scale(0.98); }
+.btn:disabled { opacity:0.45; }
+.bg { background:var(--green); }
+.bp { background:var(--purple); }
+.bw { width:100%; }
+.bi { padding:0 18px; }
+
+.chips { display:flex; flex-wrap:wrap; gap:6px; }
+.chip { font-size:12px; padding:5px 11px; border-radius:20px; border:0.5px solid var(--border); background:var(--bg); color:var(--text2); cursor:pointer; font-family:inherit; transition:all 0.15s; }
+.cg:active { background:var(--gbg); color:var(--gtxt); border-color:rgba(22,163,74,0.3); }
+.cp:active { background:var(--pbg); color:var(--ptxt); border-color:rgba(124,58,237,0.3); }
+
+.loading { display:none; text-align:center; padding:2.5rem 1rem; }
+.loading.on { display:block; }
+.dots { display:flex; gap:7px; justify-content:center; margin-bottom:12px; }
+.dot { width:9px; height:9px; border-radius:50%; animation:bounce 1.3s ease-in-out infinite; }
+.dg { background:var(--green); } .dp { background:var(--purple); } .da { background:var(--amber); }
+.dot:nth-child(2){animation-delay:0.18s} .dot:nth-child(3){animation-delay:0.36s}
+@keyframes bounce{0%,80%,100%{opacity:0.2;transform:scale(0.7)}40%{opacity:1;transform:scale(1)}}
+.llabel { font-size:14px; color:var(--text2); }
+.lprovider { font-size:11px; color:var(--text3); margin-top:4px; }
+
+.errc { display:none; border-radius:var(--rlg); padding:13px 15px; margin-bottom:12px; font-size:14px; }
+.errc.on { display:block; }
+.errc.err { background:var(--redbg); color:var(--redtxt); border:0.5px solid rgba(220,38,38,0.2); }
+.errc.warn { background:var(--amberbg); color:var(--ambertxt); border:0.5px solid rgba(217,119,6,0.2); }
+
+.rcard { display:none; background:var(--surface); border:0.5px solid var(--border); border-radius:var(--rxl); overflow:hidden; margin-bottom:12px; }
+.rcard.on { display:block; }
+.rhead { padding:13px 16px; border-bottom:0.5px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.rhead.g { background:var(--gbg); } .rhead.p { background:var(--pbg); }
+.rname { font-size:17px; font-weight:700; letter-spacing:-0.2px; }
+.rname.g { color:var(--gtxt); } .rname.p { color:var(--ptxt); }
+.rbadge { font-size:10px; font-weight:600; padding:3px 8px; border-radius:20px; color:#fff; white-space:nowrap; flex-shrink:0; display:flex; align-items:center; gap:4px; }
+.rbg { background:var(--green); } .rbp { background:var(--purple); }
+.rprovider { font-size:10px; opacity:0.8; }
+
+.rbody { padding:14px 16px; }
+.rsec { margin-bottom:14px; }
+.rsec:last-child { margin-bottom:0; }
+.rstitle { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--text3); margin-bottom:4px; }
+.rscontent { font-size:15px; line-height:1.7; color:var(--text); }
+.rscontent a { color:var(--blue); text-decoration:none; word-break:break-all; }
+.rscontent ul { padding-left:1.2rem; margin-top:4px; }
+.rscontent li { margin-bottom:3px; }
+.rscontent strong { font-weight:600; }
+
+.grphead { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; padding:9px 14px 7px; border-bottom:0.5px solid var(--border); }
+.grphead.g { color:var(--gtxt); background:var(--gbg); }
+.grphead.p { color:var(--ptxt); background:var(--pbg); }
+.grpcontent { padding:10px 14px; font-size:15px; line-height:1.7; color:var(--text); }
+.grpcontent ul { padding-left:1.2rem; margin-top:4px; }
+.grpcontent li { margin-bottom:3px; }
+.grpcontent strong { font-weight:600; }
+
+.div { height:0.5px; background:var(--border); margin:11px 0; }
+.hidden { display:none; }
+.btnnew { display:none; width:100%; height:44px; border-radius:var(--rmd); border:0.5px solid var(--border-med); background:var(--surface); color:var(--text2); font-size:14px; font-family:inherit; cursor:pointer; margin-bottom:12px; }
+.btnnew.on { display:block; }
+.disc { font-size:11px; color:var(--text3); text-align:center; line-height:1.6; padding:4px 1rem 16px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="header">
+  <div class="app-icon">
+    <svg viewBox="0 0 30 30" fill="none"><rect x="12.5" y="2" width="5" height="26" rx="2.5" fill="#16a34a"/><rect x="2" y="12.5" width="26" height="5" rx="2.5" fill="#7c3aed"/></svg>
+  </div>
+  <h1>Ganzheitsmedizin Experte</h1>
+  <p>Supplements, Homöopathie &amp; Naturheilkunde</p>
+</div>
+
+<!-- API Provider Selector -->
+<div class="api-selector">
+  <div class="api-label">KI-Anbieter</div>
+  <div class="api-btns">
+    <button class="api-btn sel-gemini" id="btnGemini" onclick="setProvider('gemini')">
+      <span>Gemini Flash</span>
+      <span class="api-badge-free">GRATIS</span>
+    </button>
+    <button class="api-btn" id="btnClaude" onclick="setProvider('claude')">
+      <span>Claude Sonnet</span>
+      <span class="api-badge-pro">PREMIUM</span>
+    </button>
+  </div>
+  <div id="geminiKeyPanel">
+    <div class="key-row">
+      <label>API Key:</label>
+      <input type="password" id="geminiKey" placeholder="Gemini API Key eingeben..." autocomplete="off" oninput="saveKey('gemini')"/>
+      <a class="key-link" href="https://aistudio.google.com/apikey" target="_blank">Key holen</a>
+    </div>
+    <div class="key-hint">Kostenlos unter <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a> &mdash; 1.500 Anfragen/Tag gratis</div>
+    <div class="key-saved" id="geminiSaved">&#x2713; Key gespeichert</div>
+  </div>
+  <div id="claudeKeyPanel" class="hidden">
+    <div class="key-row">
+      <label>API Key:</label>
+      <input type="password" id="claudeKey" class="claude-key" placeholder="sk-ant-..." autocomplete="off" oninput="saveKey('claude')"/>
+      <a class="key-link" href="https://console.anthropic.com/settings/keys" target="_blank">Key holen</a>
+    </div>
+    <div class="key-hint">Unter <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> &mdash; ca. 1&ndash;2 Cent pro Anfrage</div>
+    <div class="key-saved" id="claudeSaved">&#x2713; Key gespeichert</div>
+  </div>
+</div>
+
+<!-- Mode Toggle -->
+<div class="toggle">
+  <button class="tbtn ag" id="btnS" onclick="setMode('s')">&#x1F48A; Mittel-Info</button>
+  <button class="tbtn" id="btnB" onclick="setMode('b')">&#x1F50D; Beschwerde-Suche</button>
+</div>
+
+<!-- Supplement Panel -->
+<div id="panelS">
+  <div class="card">
+    <div class="irow">
+      <input type="text" id="sinp" placeholder="z.B. Magnesium, Arnica C30, Vitamin D..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"/>
+      <button class="btn bg bi" id="sbtn" onclick="doSupplement()">Suchen</button>
+    </div>
+    <div class="slabel">Schnellauswahl</div>
+    <div class="chips">
+      <button class="chip cg" onclick="qs('Magnesium')">Magnesium</button>
+      <button class="chip cg" onclick="qs('Vitamin D3')">Vitamin D3</button>
+      <button class="chip cg" onclick="qs('Omega-3')">Omega-3</button>
+      <button class="chip cg" onclick="qs('Zink')">Zink</button>
+      <button class="chip cg" onclick="qs('Vitamin C')">Vitamin C</button>
+      <button class="chip cg" onclick="qs('B12')">B12</button>
+      <button class="chip cg" onclick="qs('Ashwagandha')">Ashwagandha</button>
+      <button class="chip cg" onclick="qs('Coenzym Q10')">Q10</button>
+      <button class="chip cg" onclick="qs('Eisen')">Eisen</button>
+      <button class="chip cg" onclick="qs('Melatonin')">Melatonin</button>
+      <div class="slabel" style="width:100%;margin-top:10px;margin-bottom:2px">Homöopathie</div>
+      <button class="chip cg" onclick="qs('Arnica montana C30')">Arnica C30</button>
+      <button class="chip cg" onclick="qs('Belladonna C30')">Belladonna C30</button>
+      <button class="chip cg" onclick="qs('Nux vomica C30')">Nux vomica C30</button>
+      <button class="chip cg" onclick="qs('Chamomilla C30')">Chamomilla C30</button>
+      <button class="chip cg" onclick="qs('Apis mellifica C30')">Apis C30</button>
+      <button class="chip cg" onclick="qs('Bryonia C30')">Bryonia C30</button>
+      <button class="chip cg" onclick="qs('Rhus toxicodendron C30')">Rhus tox C30</button>
+      <button class="chip cg" onclick="qs('Pulsatilla C30')">Pulsatilla C30</button>
+    </div>
+  </div>
+</div>
+
+<!-- Symptom Panel -->
+<div id="panelB" class="hidden">
+  <div class="card">
+    <div class="slabel" style="margin-bottom:6px">Beschreibe deine Beschwerden</div>
+    <textarea class="sinput" id="binp" placeholder="z.B. Ich habe Kopfschmerzen und bin muede..." rows="3"></textarea>
+    <button class="btn bp bw" id="bbtn" onclick="doSymptom()">Empfehlungen holen</button>
+  </div>
+  <div class="card" style="padding-top:12px">
+    <div class="slabel">Haufige Beschwerden</div>
+    <div class="chips">
+      <button class="chip cp" onclick="qb('Kopfschmerzen')">Kopfschmerzen</button>
+      <button class="chip cp" onclick="qb('Schlafprobleme')">Schlafprobleme</button>
+      <button class="chip cp" onclick="qb('Muedigkeit und Erschoepfung')">Muedigkeit</button>
+      <button class="chip cp" onclick="qb('Gelenkschmerzen')">Gelenkschmerzen</button>
+      <button class="chip cp" onclick="qb('Verdauungsprobleme Blahungen')">Verdauung</button>
+      <button class="chip cp" onclick="qb('Stress und Nervositaet')">Stress</button>
+      <button class="chip cp" onclick="qb('Immunsystem staerken')">Immunsystem</button>
+      <button class="chip cp" onclick="qb('Konzentrationsprobleme')">Konzentration</button>
+      <button class="chip cp" onclick="qb('Muskelkraempfe')">Muskelkraempfe</button>
+      <button class="chip cp" onclick="qb('Erkaltung Schnupfen Halsschmerzen')">Erkaltung</button>
+      <button class="chip cp" onclick="qb('Rueckenschmerzen Verspannungen')">Rueckenschmerzen</button>
+      <button class="chip cp" onclick="qb('Bluthochdruck Herz Kreislauf')">Blutdruck</button>
+      <button class="chip cp" onclick="qb('Haare Nagel Haut Probleme')">Haut &amp; Haare</button>
+      <button class="chip cp" onclick="qb('Stimmungstief Antriebslosigkeit')">Stimmung</button>
+    </div>
+  </div>
+</div>
+
+<div class="loading" id="loader">
+  <div class="dots" id="ldots">
+    <div class="dot dg"></div><div class="dot dg"></div><div class="dot dg"></div>
+  </div>
+  <div class="llabel" id="ltxt">Analysiere...</div>
+  <div class="lprovider" id="lprov"></div>
+</div>
+
+<div class="errc" id="errc"></div>
+
+<div class="rcard" id="rcS">
+  <div class="rhead g">
+    <div class="rname g" id="rnS"></div>
+    <div class="rbadge rbg">Experten-Info <span class="rprovider" id="rpS"></span></div>
+  </div>
+  <div class="rbody" id="rbS"></div>
+</div>
+
+<div class="rcard" id="rcB">
+  <div class="rhead p">
+    <div class="rname p" id="rnB"></div>
+    <div class="rbadge rbp">Empfehlungen <span class="rprovider" id="rpB"></span></div>
+  </div>
+  <div class="rbody" id="rbB"></div>
+</div>
+
+<button class="btnnew" id="btnnew" onclick="reset()">Neue Suche</button>
+
+<div class="disc">
+  Nur zur Information &mdash; kein Ersatz fur arztliche Beratung.<br>
+  Bei ernsthaften Beschwerden bitte einen Arzt aufsuchen.
+</div>
+
+</div>
+<script>
+var mode = 's';
+var provider = 'gemini';
+
+// ── Prompts ──────────────────────────────────────────────────────────────────
+
+var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungsergaenzungsmittel und Homoeopathie.\n\nWenn nach einem homoeopathischen Mittel gefragt wird (z.B. Arnica, Belladonna, Nux vomica, Potenzangabe wie C30), gib homoeopathische Informationen. Bei Nahrungsergaenzungsmitteln (z.B. Magnesium, Vitamin D) gib NEM-Informationen. Passe die Abschnitte entsprechend an.\n\nGib strukturierte Informationen mit exakt diesen Trennzeichen:\n\n###EG###\n[Grobes Einsatzgebiet / Wofuer wird es verwendet]\n\n###AW###\n[Spezieller Anwendungsbereich / Typisches Anwendungsbild]\n\n###EI###\n[Einnahmeempfehlungen / Einnahmehinweise]\n\n###DO###\n[Dosierungshinweise / Potenz und Einnahmefrequenz bei Homoeopathie]\n\n###DA###\n[Dauereinnahme oder Kureinnahme empfehlenswert? Begruendung]\n\n###KQ###\n[Bezugsquellen: Apotheke, Reformhaus, Online-Shops]\n\n###KO###\n[Gute Kombinationen mit anderen Mitteln und Erklarung]\n\nAuf Deutsch, klar und praxisnah.';
+
+var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde und Homoeopathie.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
+
+var SS = {'EG':'Einsatzgebiet','AW':'Spezieller Anwendungsbereich','EI':'Einnahmeempfehlungen','DO':'Dosierungshinweise','DA':'Dauereinnahme','KQ':'Kaufquellen','KO':'Kombinationen'};
+var SB = {'UR':'Moegliche Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Homoeopathische Mittel','LS':'Lebensstil-Tipps','HI':'Wichtiger Hinweis'};
+
+// ── Key Storage ───────────────────────────────────────────────────────────────
+
+function saveKey(prov) {
+  var val = document.getElementById(prov === 'gemini' ? 'geminiKey' : 'claudeKey').value.trim();
+  try { localStorage.setItem('nem_key_' + prov, val); } catch(e) {}
+  var saved = document.getElementById(prov === 'gemini' ? 'geminiSaved' : 'claudeSaved');
+  saved.classList.toggle('on', val.length > 10);
+}
+
+function loadKeys() {
+  try {
+    var gk = localStorage.getItem('nem_key_gemini') || '';
+    var ck = localStorage.getItem('nem_key_claude') || '';
+    if (gk) { document.getElementById('geminiKey').value = gk; document.getElementById('geminiSaved').classList.add('on'); }
+    if (ck) { document.getElementById('claudeKey').value = ck; document.getElementById('claudeSaved').classList.add('on'); }
+  } catch(e) {}
+}
+
+function getKey(prov) {
+  try { return localStorage.getItem('nem_key_' + prov) || ''; } catch(e) { return ''; }
+}
+
+// ── Provider Toggle ───────────────────────────────────────────────────────────
+
+function setProvider(p) {
+  provider = p;
+  document.getElementById('btnGemini').className = p === 'gemini' ? 'api-btn sel-gemini' : 'api-btn';
+  document.getElementById('btnClaude').className = p === 'claude' ? 'api-btn sel-claude' : 'api-btn';
+  document.getElementById('geminiKeyPanel').classList.toggle('hidden', p !== 'gemini');
+  document.getElementById('claudeKeyPanel').classList.toggle('hidden', p !== 'claude');
+  var dots = document.getElementById('ldots').children;
+  var cls = p === 'claude' ? 'dot da' : (mode === 'b' ? 'dot dp' : 'dot dg');
+  for (var i = 0; i < dots.length; i++) dots[i].className = cls;
+}
+
+// ── Mode Toggle ───────────────────────────────────────────────────────────────
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('panelS').classList.toggle('hidden', m !== 's');
+  document.getElementById('panelB').classList.toggle('hidden', m === 's');
+  document.getElementById('btnS').className = m === 's' ? 'tbtn ag' : 'tbtn';
+  document.getElementById('btnB').className = m === 'b' ? 'tbtn ap' : 'tbtn';
+  reset();
+}
+
+function reset() {
+  ['rcS','rcB','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  document.getElementById('sinp').value = '';
+  document.getElementById('binp').value = '';
+  window.scrollTo(0,0);
+}
+
+function qs(n) { document.getElementById('sinp').value = n; doSupplement(); }
+function qb(n) { document.getElementById('binp').value = n; doSymptom(); }
+document.getElementById('sinp').addEventListener('keydown', function(e){ if(e.key==='Enter'){this.blur();doSupplement();} });
+
+// ── API Calls ─────────────────────────────────────────────────────────────────
+
+async function callGemini(sys, msg) {
+  var key = getKey('gemini');
+  if (!key) throw new Error('NOKEY_GEMINI');
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + key;
+  var body = {
+    system_instruction: { parts: [{ text: sys }] },
+    contents: [{ role: 'user', parts: [{ text: msg }] }]
+  };
+  var r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) {
+    var err = await r.json().catch(function(){ return {}; });
+    var msg2 = (err.error && err.error.message) ? err.error.message : 'Status ' + r.status;
+    throw new Error(msg2);
+  }
+  var d = await r.json();
+  return d.candidates[0].content.parts[0].text;
+}
+
+async function callClaude(sys, msg) {
+  var key = getKey('claude');
+  if (!key) throw new Error('NOKEY_CLAUDE');
+  var r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1200,
+      system: sys,
+      messages: [{ role: 'user', content: msg }]
+    })
+  });
+  if (!r.ok) throw new Error('Status ' + r.status);
+  var d = await r.json();
+  return d.content[0].text;
+}
+
+async function callAPI(sys, msg) {
+  if (provider === 'claude') return callClaude(sys, msg);
+  return callGemini(sys, msg);
+}
+
+function providerLabel() {
+  return provider === 'claude' ? 'Claude' : 'Gemini';
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+
+function parseSec(text, map) {
+  var keys = Object.keys(map), res = [];
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i], nk = keys[i+1];
+    var si = text.indexOf('###'+k+'###');
+    if (si === -1) continue;
+    var cs = si + ('###'+k+'###').length;
+    var ce = nk ? text.indexOf('###'+nk+'###') : text.length;
+    res.push({ k: k, t: map[k], c: text.slice(cs, ce !== -1 ? ce : text.length).trim() });
+  }
+  return res;
+}
+
+function fmt(t) {
+  return t
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>')
+    .replace(/\n{2,}/g,'<br><br>').replace(/\n/g,'<br>')
+    .replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1">$1</a>');
+}
+
+function renderS(name, text) {
+  var secs = parseSec(text, SS), h = '';
+  for (var i = 0; i < secs.length; i++) {
+    if (i > 0) h += '<div class="div"></div>';
+    h += '<div class="rsec"><div class="rstitle">'+secs[i].t+'</div><div class="rscontent">'+fmt(secs[i].c)+'</div></div>';
+  }
+  document.getElementById('rnS').textContent = name;
+  document.getElementById('rpS').textContent = '· ' + providerLabel();
+  document.getElementById('rbS').innerHTML = h || '<div class="rscontent">'+fmt(text)+'</div>';
+  document.getElementById('rcS').classList.add('on');
+}
+
+function renderB(complaint, text) {
+  var secs = parseSec(text, SB), h = '';
+  for (var i = 0; i < secs.length; i++) {
+    var s = secs[i];
+    if (i > 0) h += '<div class="div"></div>';
+    if (s.k === 'NEM') {
+      h += '<div class="grphead g">&#x1F4CA; Supplements &amp; Naturprodukte</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+    } else if (s.k === 'HOM') {
+      h += '<div class="grphead p">&#x2697;&#xFE0F; Homoeopathische Mittel</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+    } else {
+      h += '<div class="rsec"><div class="rstitle">'+s.t+'</div><div class="rscontent">'+fmt(s.c)+'</div></div>';
+    }
+  }
+  document.getElementById('rnB').textContent = complaint;
+  document.getElementById('rpB').textContent = '· ' + providerLabel();
+  document.getElementById('rbB').innerHTML = h || '<div class="rscontent">'+fmt(text)+'</div>';
+  document.getElementById('rcB').classList.add('on');
+}
+
+// ── UI Helpers ────────────────────────────────────────────────────────────────
+
+function startLoad(txt) {
+  document.getElementById('ltxt').textContent = txt;
+  document.getElementById('lprov').textContent = 'via ' + providerLabel();
+  document.getElementById('loader').classList.add('on');
+  ['rcS','rcB','errc','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  var dotClass = provider === 'claude' ? 'dot da' : (mode === 'b' ? 'dot dp' : 'dot dg');
+  var dots = document.getElementById('ldots').children;
+  for (var i = 0; i < dots.length; i++) dots[i].className = dotClass;
+}
+function stopLoad() { document.getElementById('loader').classList.remove('on'); }
+
+function showErr(msg, type) {
+  var e = document.getElementById('errc');
+  e.textContent = msg;
+  e.className = 'errc on ' + (type || 'err');
+}
+
+function handleError(err) {
+  if (err.message === 'NOKEY_GEMINI') {
+    showErr('Bitte zuerst deinen Gemini API Key eingeben. Kostenlos unter aistudio.google.com', 'warn');
+  } else if (err.message === 'NOKEY_CLAUDE') {
+    showErr('Bitte zuerst deinen Claude API Key eingeben. Unter console.anthropic.com', 'warn');
+  } else if (err.message.indexOf('API_KEY_INVALID') !== -1 || err.message.indexOf('401') !== -1) {
+    showErr('API Key ungultig. Bitte Key prufen und neu eingeben.', 'err');
+  } else if (err.message.indexOf('429') !== -1 || err.message.indexOf('RESOURCE_EXHAUSTED') !== -1) {
+    if (provider === 'gemini') {
+      showErr('Gemini Tageslimit erreicht (1.500/Tag). Bitte morgen wieder versuchen oder auf Claude wechseln.', 'warn');
+    } else {
+      showErr('Rate Limit erreicht. Bitte kurz warten und erneut versuchen.', 'warn');
+    }
+  } else {
+    showErr('Fehler: ' + err.message + '. Bitte erneut versuchen.', 'err');
+  }
+}
+
+// ── Main Actions ──────────────────────────────────────────────────────────────
+
+async function doSupplement() {
+  var v = document.getElementById('sinp').value.trim();
+  if (!v) { document.getElementById('sinp').focus(); return; }
+  document.getElementById('sinp').blur();
+  document.getElementById('sbtn').disabled = true;
+  startLoad('Analysiere ' + v + '...');
+  try {
+    var t = await callAPI(SYS_S, 'Nahrungsergaenzungsmittel: ' + v);
+    renderS(v, t);
+    document.getElementById('btnnew').classList.add('on');
+    setTimeout(function(){ document.getElementById('rcS').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
+  } catch(e) { handleError(e); }
+  finally { stopLoad(); document.getElementById('sbtn').disabled = false; }
+}
+
+async function doSymptom() {
+  var v = document.getElementById('binp').value.trim();
+  if (!v) { document.getElementById('binp').focus(); return; }
+  document.getElementById('binp').blur();
+  document.getElementById('bbtn').disabled = true;
+  startLoad('Suche Empfehlungen...');
+  try {
+    var t = await callAPI(SYS_B, 'Meine Beschwerden: ' + v);
+    renderB(v, t);
+    document.getElementById('btnnew').classList.add('on');
+    setTimeout(function(){ document.getElementById('rcB').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
+  } catch(e) { handleError(e); }
+  finally { stopLoad(); document.getElementById('bbtn').disabled = false; }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadKeys();
+</script>
+</body>
+</html>
