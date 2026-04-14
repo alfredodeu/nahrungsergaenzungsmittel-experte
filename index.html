@@ -390,7 +390,7 @@ document.getElementById('sinp').addEventListener('keydown', function(e){ if(e.ke
 // ── API Calls ─────────────────────────────────────────────────────────────────
 
 async function callGemini(sys, msg) {
-  var key = getKey('gemini') || (GEMINI_DEFAULT_KEY.indexOf('%') === -1 ? GEMINI_DEFAULT_KEY : '');
+  var key = (GEMINI_DEFAULT_KEY.indexOf('%') === -1 ? GEMINI_DEFAULT_KEY : '') || getKey('gemini');
   if (!key) throw new Error('NOKEY_GEMINI');
   var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + key;
   var body = {
