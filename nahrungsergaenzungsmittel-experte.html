@@ -155,31 +155,13 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
   <p>Supplements, Homöopathie, Schüßlersalze &amp; Naturheilkunde</p>
 </div>
 
-<!-- API Provider Selector -->
+<!-- Premium Toggle -->
 <div class="api-selector">
-  <div class="api-label">KI-Anbieter</div>
-  <div class="api-btns">
-    <button class="api-btn sel-gemini" id="btnGemini" onclick="setProvider('gemini')">
-      <span>Gemini Flash</span>
-      <span class="api-badge-free">GRATIS</span>
-    </button>
-    <button class="api-btn" id="btnClaude" onclick="setProvider('claude')">
-      <span>Claude Sonnet</span>
-      <span class="api-badge-pro">PREMIUM</span>
-    </button>
-  </div>
-  <div id="geminiKeyPanel">
+  <div class="api-label">Premium-Modus</div>
+  <button class="cmp-btn" id="btnCmp" onclick="togglePremium()">⚡ Premium: + Claude KI aktivieren</button>
+  <div id="claudeKeyPanel" class="hidden" style="margin-top:10px">
     <div class="key-row">
-      <label>API Key:</label>
-      <input type="password" id="geminiKey" placeholder="Gemini API Key eingeben..." autocomplete="off" oninput="saveKey('gemini')"/>
-      <a class="key-link" href="https://aistudio.google.com/apikey" target="_blank">Key holen</a>
-    </div>
-    <div class="key-hint">Kostenlos unter <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a> &mdash; 1.500 Anfragen/Tag gratis</div>
-    <div class="key-saved" id="geminiSaved">&#x2713; Key gespeichert</div>
-  </div>
-  <div id="claudeKeyPanel" class="hidden">
-    <div class="key-row">
-      <label>API Key:</label>
+      <label>Claude Key:</label>
       <input type="password" id="claudeKey" class="claude-key" placeholder="sk-ant-..." autocomplete="off" oninput="saveKey('claude')"/>
       <a class="key-link" href="https://console.anthropic.com/settings/keys" target="_blank">Key holen</a>
     </div>
@@ -304,6 +286,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 <script>
 var mode = 's';
 var provider = 'gemini';
+var GEMINI_DEFAULT_KEY = '%%GEMINI_API_KEY%%';
 
 // ── Prompts ──────────────────────────────────────────────────────────────────
 
@@ -317,17 +300,15 @@ var SB = {'UR':'Moegliche Ursachen','NEM':'Supplements & Naturprodukte','HOM':'H
 // ── Key Storage ───────────────────────────────────────────────────────────────
 
 function saveKey(prov) {
-  var val = document.getElementById(prov === 'gemini' ? 'geminiKey' : 'claudeKey').value.trim();
-  try { localStorage.setItem('nem_key_' + prov, val); } catch(e) {}
-  var saved = document.getElementById(prov === 'gemini' ? 'geminiSaved' : 'claudeSaved');
-  saved.classList.toggle('on', val.length > 10);
+  if (prov !== 'claude') return;
+  var val = document.getElementById('claudeKey').value.trim();
+  try { localStorage.setItem('nem_key_claude', val); } catch(e) {}
+  document.getElementById('claudeSaved').classList.toggle('on', val.length > 10);
 }
 
 function loadKeys() {
   try {
-    var gk = localStorage.getItem('nem_key_gemini') || '';
     var ck = localStorage.getItem('nem_key_claude') || '';
-    if (gk) { document.getElementById('geminiKey').value = gk; document.getElementById('geminiSaved').classList.add('on'); }
     if (ck) { document.getElementById('claudeKey').value = ck; document.getElementById('claudeSaved').classList.add('on'); }
   } catch(e) {}
 }
@@ -336,17 +317,13 @@ function getKey(prov) {
   try { return localStorage.getItem('nem_key_' + prov) || ''; } catch(e) { return ''; }
 }
 
-// ── Provider Toggle ───────────────────────────────────────────────────────────
+// ── Premium Toggle ────────────────────────────────────────────────────────────
 
-function setProvider(p) {
-  provider = p;
-  document.getElementById('btnGemini').className = p === 'gemini' ? 'api-btn sel-gemini' : 'api-btn';
-  document.getElementById('btnClaude').className = p === 'claude' ? 'api-btn sel-claude' : 'api-btn';
-  document.getElementById('geminiKeyPanel').classList.toggle('hidden', p !== 'gemini');
-  document.getElementById('claudeKeyPanel').classList.toggle('hidden', p !== 'claude');
-  var dots = document.getElementById('ldots').children;
-  var cls = p === 'claude' ? 'dot da' : (mode === 'b' ? 'dot dp' : 'dot dg');
-  for (var i = 0; i < dots.length; i++) dots[i].className = cls;
+var premiumMode = false;
+function togglePremium() {
+  premiumMode = !premiumMode;
+  document.getElementById('btnCmp').classList.toggle('on', premiumMode);
+  document.getElementById('claudeKeyPanel').classList.toggle('hidden', !premiumMode);
 }
 
 // ── Mode Toggle ───────────────────────────────────────────────────────────────
@@ -374,7 +351,7 @@ document.getElementById('sinp').addEventListener('keydown', function(e){ if(e.ke
 // ── API Calls ─────────────────────────────────────────────────────────────────
 
 async function callGemini(sys, msg) {
-  var key = getKey('gemini');
+  var key = getKey('gemini') || (GEMINI_DEFAULT_KEY.indexOf('%') === -1 ? GEMINI_DEFAULT_KEY : '');
   if (!key) throw new Error('NOKEY_GEMINI');
   var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + key;
   var body = {
