@@ -21,8 +21,16 @@ jobs:
         env:
           GEMINI_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          sed -i "s/%%GEMINI_API_KEY%%/${GEMINI_KEY}/g" index.html
-          sed -i "s/%%GEMINI_API_KEY%%/${GEMINI_KEY}/g" nahrungsergaenzungsmittel-experte.html
+          python3 -c "
+import os
+key = os.environ['GEMINI_KEY']
+for fname in ['index.html', 'nahrungsergaenzungsmittel-experte.html']:
+    with open(fname) as f:
+        c = f.read()
+    with open(fname, 'w') as f:
+        f.write(c.replace('%%GEMINI_API_KEY%%', key))
+print('Key injected into both files')
+"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
