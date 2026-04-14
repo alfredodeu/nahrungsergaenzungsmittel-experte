@@ -17,6 +17,7 @@
   --purple:#7c3aed; --pbg:#f5f3ff; --ptxt:#6d28d9; --plight:rgba(124,58,237,0.12);
   --amber:#d97706; --amberbg:#fffbeb; --ambertxt:#92400e;
   --blue:#2563eb; --bluebg:#eff6ff; --bluetxt:#1d4ed8;
+  --teal:#0d9488; --tealbg:#f0fdfa; --tealtxt:#0f766e; --teallight:rgba(13,148,136,0.12);
   --redbg:#fef2f2; --redtxt:#dc2626;
   --rmd:10px; --rlg:14px; --rxl:18px;
 }
@@ -28,6 +29,7 @@
     --purple:#a78bfa; --pbg:#2e1065; --ptxt:#c4b5fd; --plight:rgba(167,139,250,0.12);
     --amber:#fbbf24; --amberbg:#2d1a00; --ambertxt:#fcd34d;
     --blue:#60a5fa; --bluebg:#1e3a5f; --bluetxt:#93c5fd;
+    --teal:#2dd4bf; --tealbg:#022c22; --tealtxt:#5eead4; --teallight:rgba(45,212,191,0.12);
     --redbg:#2d0a0a; --redtxt:#f87171;
   }
 }
@@ -129,6 +131,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .grphead { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; padding:9px 14px 7px; border-bottom:0.5px solid var(--border); }
 .grphead.g { color:var(--gtxt); background:var(--gbg); }
 .grphead.p { color:var(--ptxt); background:var(--pbg); }
+.grphead.t { color:var(--tealtxt); background:var(--tealbg); }
 .grpcontent { padding:10px 14px; font-size:15px; line-height:1.7; color:var(--text); }
 .grpcontent ul { padding-left:1.2rem; margin-top:4px; }
 .grpcontent li { margin-bottom:3px; }
@@ -149,7 +152,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
     <svg viewBox="0 0 30 30" fill="none"><rect x="12.5" y="2" width="5" height="26" rx="2.5" fill="#16a34a"/><rect x="2" y="12.5" width="26" height="5" rx="2.5" fill="#7c3aed"/></svg>
   </div>
   <h1>Ganzheitsmedizin Experte</h1>
-  <p>Supplements, Homöopathie &amp; Naturheilkunde</p>
+  <p>Supplements, Homöopathie, Schüßlersalze &amp; Naturheilkunde</p>
 </div>
 
 <!-- API Provider Selector -->
@@ -219,6 +222,19 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
       <button class="chip cg" onclick="qs('Bryonia C30')">Bryonia C30</button>
       <button class="chip cg" onclick="qs('Rhus toxicodendron C30')">Rhus tox C30</button>
       <button class="chip cg" onclick="qs('Pulsatilla C30')">Pulsatilla C30</button>
+      <div class="slabel" style="width:100%;margin-top:10px;margin-bottom:2px">Schüßlersalze</div>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 1 Calcium fluoratum D12')">Nr. 1 Calc. fluor.</button>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 2 Calcium phosphoricum D6')">Nr. 2 Calc. phos.</button>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 3 Ferrum phosphoricum D12')">Nr. 3 Ferr. phos.</button>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 4 Kalium chloratum D6')">Nr. 4 Kali. chlor.</button>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 5 Kalium phosphoricum D6')">Nr. 5 Kali. phos.</button>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 6 Kalium sulfuricum D6')">Nr. 6 Kali. sulf.</button>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 7 Magnesium phosphoricum D6')">Nr. 7 Mag. phos.</button>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 8 Natrium chloratum D6')">Nr. 8 Natr. chlor.</button>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 9 Natrium phosphoricum D6')">Nr. 9 Natr. phos.</button>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 10 Natrium sulfuricum D6')">Nr. 10 Natr. sulf.</button>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 11 Silicea D12')">Nr. 11 Silicea</button>
+      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 12 Calcium sulfuricum D6')">Nr. 12 Calc. sulf.</button>
     </div>
   </div>
 </div>
@@ -291,12 +307,12 @@ var provider = 'gemini';
 
 // ── Prompts ──────────────────────────────────────────────────────────────────
 
-var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungsergaenzungsmittel und Homoeopathie.\n\nWenn nach einem homoeopathischen Mittel gefragt wird (z.B. Arnica, Belladonna, Nux vomica, Potenzangabe wie C30), gib homoeopathische Informationen. Bei Nahrungsergaenzungsmitteln (z.B. Magnesium, Vitamin D) gib NEM-Informationen. Passe die Abschnitte entsprechend an.\n\nGib strukturierte Informationen mit exakt diesen Trennzeichen:\n\n###EG###\n[Grobes Einsatzgebiet / Wofuer wird es verwendet]\n\n###AW###\n[Spezieller Anwendungsbereich / Typisches Anwendungsbild]\n\n###EI###\n[Einnahmeempfehlungen / Einnahmehinweise]\n\n###DO###\n[Dosierungshinweise / Potenz und Einnahmefrequenz bei Homoeopathie]\n\n###DA###\n[Dauereinnahme oder Kureinnahme empfehlenswert? Begruendung]\n\n###KQ###\n[Bezugsquellen: Apotheke, Reformhaus, Online-Shops]\n\n###KO###\n[Gute Kombinationen mit anderen Mitteln und Erklarung]\n\nAuf Deutsch, klar und praxisnah.';
+var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungsergaenzungsmittel, Homoeopathie und Schuessler-Salze.\n\nWenn nach einem Schuessler-Salz gefragt wird (z.B. Nr. 7 Magnesium phosphoricum, Calcium fluoratum, Natrium muriaticum), gib biochemische Informationen nach Dr. Wilhelm Heinrich Schuessler: Mineralstofftherapie, Wirkprinzip, Anwendungsgebiete und Einnahme als Tabletten (D6 oder D12). Wenn nach einem homoeopathischen Mittel gefragt wird (z.B. Arnica, Belladonna, Nux vomica, Potenzangabe wie C30), gib homoeopathische Informationen. Bei Nahrungsergaenzungsmitteln (z.B. Magnesium, Vitamin D) gib NEM-Informationen. Passe die Abschnitte entsprechend an.\n\nGib strukturierte Informationen mit exakt diesen Trennzeichen:\n\n###EG###\n[Grobes Einsatzgebiet / Wofuer wird es verwendet]\n\n###AW###\n[Spezieller Anwendungsbereich / Typisches Anwendungsbild]\n\n###EI###\n[Einnahmeempfehlungen / Einnahmehinweise]\n\n###DO###\n[Dosierungshinweise / Potenz und Einnahmefrequenz bei Homoeopathie]\n\n###DA###\n[Dauereinnahme oder Kureinnahme empfehlenswert? Begruendung]\n\n###KQ###\n[Bezugsquellen: Apotheke, Reformhaus, Online-Shops]\n\n###KO###\n[Gute Kombinationen mit anderen Mitteln und Erklarung]\n\nAuf Deutsch, klar und praxisnah.';
 
-var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde und Homoeopathie.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
+var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde, Homoeopathie und Schuessler-Salze.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme]\n\n###SCH###\n[2-3 passende Schuessler-Salze. Fuer jedes: **Nr. X Name (Potenz)** - Biochemisches Wirkprinzip und warum es bei diesen Beschwerden hilft]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
 
 var SS = {'EG':'Einsatzgebiet','AW':'Spezieller Anwendungsbereich','EI':'Einnahmeempfehlungen','DO':'Dosierungshinweise','DA':'Dauereinnahme','KQ':'Kaufquellen','KO':'Kombinationen'};
-var SB = {'UR':'Moegliche Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Homoeopathische Mittel','LS':'Lebensstil-Tipps','HI':'Wichtiger Hinweis'};
+var SB = {'UR':'Moegliche Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Homoeopathische Mittel','SCH':'Schuessler-Salze','LS':'Lebensstil-Tipps','HI':'Wichtiger Hinweis'};
 
 // ── Key Storage ───────────────────────────────────────────────────────────────
 
@@ -456,6 +472,8 @@ function renderB(complaint, text) {
       h += '<div class="grphead g">&#x1F4CA; Supplements &amp; Naturprodukte</div><div class="grpcontent">'+fmt(s.c)+'</div>';
     } else if (s.k === 'HOM') {
       h += '<div class="grphead p">&#x2697;&#xFE0F; Homoeopathische Mittel</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+    } else if (s.k === 'SCH') {
+      h += '<div class="grphead t">&#x2B22; Sch\u00fc\u00dflersalze</div><div class="grpcontent">'+fmt(s.c)+'</div>';
     } else {
       h += '<div class="rsec"><div class="rstitle">'+s.t+'</div><div class="rscontent">'+fmt(s.c)+'</div></div>';
     }
@@ -512,7 +530,7 @@ async function doSupplement() {
   document.getElementById('sbtn').disabled = true;
   startLoad('Analysiere ' + v + '...');
   try {
-    var t = await callAPI(SYS_S, 'Nahrungsergaenzungsmittel: ' + v);
+    var t = await callAPI(SYS_S, 'Ganzheitsmedizin-Mittel: ' + v);
     renderS(v, t);
     document.getElementById('btnnew').classList.add('on');
     setTimeout(function(){ document.getElementById('rcS').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
