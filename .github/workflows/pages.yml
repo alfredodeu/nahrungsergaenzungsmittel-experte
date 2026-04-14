@@ -20,7 +20,7 @@ jobs:
       - name: Inject Gemini API Key
         env:
           GEMINI_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python3 -c "import os; k=os.environ['GEMINI_KEY']; [open(f,'w').write(open(f).read().replace('%%GEMINI_API_KEY%%',k)) for f in ['index.html','nahrungsergaenzungsmittel-experte.html']]; print('Done')"
+        run: python3 -c "import os,pathlib; k=os.environ['GEMINI_KEY']; [pathlib.Path(f).write_text(pathlib.Path(f).read_text(encoding='utf-8').replace('%%GEMINI_API_KEY%%',k),encoding='utf-8') for f in ['index.html','nahrungsergaenzungsmittel-experte.html']]; print('Done')"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
