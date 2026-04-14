@@ -482,7 +482,7 @@ function showErr(msg, type) {
 
 function handleError(err) {
   if (err.message === 'NOKEY_GEMINI') {
-    showErr('Bitte zuerst deinen Gemini API Key eingeben. Kostenlos unter aistudio.google.com', 'warn');
+    showErr('Gemini nicht verfügbar. Bitte Seite neu laden oder später erneut versuchen.', 'warn');
   } else if (err.message === 'NOKEY_CLAUDE') {
     showErr('Bitte zuerst deinen Claude API Key eingeben. Unter console.anthropic.com', 'warn');
   } else if (err.message.indexOf('API_KEY_INVALID') !== -1 || err.message.indexOf('401') !== -1) {
