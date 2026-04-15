@@ -215,17 +215,6 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
     <div class="key-hint">Unter <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> &mdash; ca. 1&ndash;2 Cent pro Anfrage</div>
     <div class="key-saved" id="claudeSaved">&#x2713; Key gespeichert</div>
   </div>
-  <!-- Datenquellen -->
-  <div class="src-section">
-    <div class="api-label">Datenquellen (optional)</div>
-    <div class="key-row">
-      <label>USDA:</label>
-      <input type="password" id="usdaKey" class="usda-key" placeholder="DEMO_KEY funktioniert ohne Registrierung" autocomplete="off" oninput="saveKey('usda')"/>
-      <a class="key-link" href="https://fdc.nal.usda.gov/api-guide" target="_blank">Key holen</a>
-    </div>
-    <div class="key-hint">USDA FoodData Central &mdash; Lebensmittelquellen f&uuml;r N&auml;hrstoffe (kostenlos)</div>
-    <div class="key-saved" id="usdaSaved">&#x2713; Key gespeichert</div>
-  </div>
 </div>
 
 <!-- Mode Toggle -->
@@ -405,6 +394,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 var mode = 's';
 var provider = 'gemini';
 var GEMINI_DEFAULT_KEY = '%%GEMINI_API_KEY%%';
+var USDA_DEFAULT_KEY = '%%USDA_API_KEY%%';
 var premiumMode = false;
 
 // ── User Profile (for personalized reference values) ──────────────────────────
@@ -544,7 +534,7 @@ var USDA_QUERY = {
 async function callUSDA(nutKey) {
   var info = USDA_QUERY[nutKey];
   if (!info) return null;
-  var key = getKey('usda') || 'DEMO_KEY';
+  var key = (USDA_DEFAULT_KEY.indexOf('%') === -1 ? USDA_DEFAULT_KEY : '') || 'DEMO_KEY';
   var url = 'https://api.nal.usda.gov/fdc/v1/foods/search?query=' +
     encodeURIComponent(info.q) +
     '&dataType=Foundation,SR%20Legacy&pageSize=3&api_key=' +
@@ -699,22 +689,18 @@ var SB = {'UR':'Mögl. Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Hom�
 // ── Key Storage ───────────────────────────────────────────────────────────────
 
 function saveKey(prov) {
-  var ids = { claude:'claudeKey', usda:'usdaKey' };
-  var savedIds = { claude:'claudeSaved', usda:'usdaSaved' };
-  var el = document.getElementById(ids[prov]);
+  if (prov !== 'claude') return;
+  var el = document.getElementById('claudeKey');
   if (!el) return;
   var val = el.value.trim();
-  try { localStorage.setItem('nem_key_' + prov, val); } catch(e) {}
-  var saved = document.getElementById(savedIds[prov]);
-  if (saved) saved.classList.toggle('on', val.length > 4);
+  try { localStorage.setItem('nem_key_claude', val); } catch(e) {}
+  document.getElementById('claudeSaved').classList.toggle('on', val.length > 4);
 }
 
 function loadKeys() {
   try {
     var ck = localStorage.getItem('nem_key_claude') || '';
-    var uk = localStorage.getItem('nem_key_usda') || '';
     if (ck) { document.getElementById('claudeKey').value = ck; document.getElementById('claudeSaved').classList.add('on'); }
-    if (uk) { document.getElementById('usdaKey').value = uk; document.getElementById('usdaSaved').classList.add('on'); }
   } catch(e) {}
 }
 

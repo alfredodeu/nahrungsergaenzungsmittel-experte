@@ -17,10 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inject Gemini API Key
+      - name: Inject API Keys
         env:
           GEMINI_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python3 -c "import os,pathlib; k=os.environ['GEMINI_KEY']; [pathlib.Path(f).write_text(pathlib.Path(f).read_text(encoding='utf-8').replace('%%GEMINI_API_KEY%%',k),encoding='utf-8') for f in ['index.html','nahrungsergaenzungsmittel-experte.html']]; print('Done')"
+          USDA_KEY: ${{ secrets.USDA_API_KEY }}
+        run: python3 -c "import os,pathlib; gk=os.environ['GEMINI_KEY']; uk=os.environ['USDA_KEY']; [pathlib.Path(f).write_text(pathlib.Path(f).read_text(encoding='utf-8').replace('%%GEMINI_API_KEY%%',gk).replace('%%USDA_API_KEY%%',uk),encoding='utf-8') for f in ['index.html','nahrungsergaenzungsmittel-experte.html']]; print('Done')"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
