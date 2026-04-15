@@ -802,12 +802,18 @@ function providerLabel() {
 function parseSec(text, map) {
   var keys = Object.keys(map), res = [];
   for (var i = 0; i < keys.length; i++) {
-    var k = keys[i], nk = keys[i+1];
+    var k = keys[i];
     var si = text.indexOf('###'+k+'###');
     if (si === -1) continue;
     var cs = si + ('###'+k+'###').length;
-    var ce = nk ? text.indexOf('###'+nk+'###') : text.length;
-    res.push({ k: k, t: map[k], c: text.slice(cs, ce !== -1 ? ce : text.length).trim() });
+    // Find end: nearest occurrence of ANY other section marker after cs
+    var ce = text.length;
+    for (var j = 0; j < keys.length; j++) {
+      if (j === i) continue;
+      var pos = text.indexOf('###'+keys[j]+'###', cs);
+      if (pos !== -1 && pos < ce) ce = pos;
+    }
+    res.push({ k: k, t: map[k], c: text.slice(cs, ce).trim() });
   }
   return res;
 }
@@ -815,7 +821,7 @@ function parseSec(text, map) {
 function fmt(t) {
   return t
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/^[*-]\s+(.+)$/gm,'<li>$1</li>')
     .replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>')
     .replace(/\n{2,}/g,'<br><br>').replace(/\n/g,'<br>')
     .replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1">$1</a>');
