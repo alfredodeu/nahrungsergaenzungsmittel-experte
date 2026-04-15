@@ -205,7 +205,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 <!-- Premium Toggle -->
 <div class="api-selector">
   <div class="api-label">Premium-Modus</div>
-  <button class="cmp-btn" id="btnCmp" onclick="togglePremium()">&#x26A1; Premium: + Grok KI aktivieren</button>
+  <button class="cmp-btn" id="btnCmp" onclick="togglePremium()">&#x26A1; Premium: + Groq KI aktivieren</button>
 </div>
 
 <!-- Mode Toggle -->
@@ -386,7 +386,7 @@ var mode = 's';
 var provider = 'gemini';
 var GEMINI_DEFAULT_KEY = '%%GEMINI_API_KEY%%';
 var USDA_DEFAULT_KEY = '%%USDA_API_KEY%%';
-var GROK_DEFAULT_KEY = '%%GROK_API_KEY%%';
+var GROQ_DEFAULT_KEY = '%%GROQ_API_KEY%%';
 var premiumMode = false;
 
 // ── User Profile (for personalized reference values) ──────────────────────────
@@ -688,7 +688,7 @@ function loadKeys() { /* keys injected at deploy time */ }
 
 function togglePremium() {
   premiumMode = !premiumMode;
-  provider = premiumMode ? 'grok' : 'gemini';
+  provider = premiumMode ? 'groq' : 'gemini';
   document.getElementById('btnCmp').classList.toggle('on', premiumMode);
 }
 
@@ -740,14 +740,14 @@ async function callGemini(sys, msg) {
   return d.candidates[0].content.parts[0].text;
 }
 
-async function callGrok(sys, msg) {
-  var key = (GROK_DEFAULT_KEY.indexOf('%') === -1 ? GROK_DEFAULT_KEY : '');
-  if (!key) throw new Error('NOKEY_GROK');
-  var r = await fetch('https://api.x.ai/v1/chat/completions', {
+async function callGroq(sys, msg) {
+  var key = (GROQ_DEFAULT_KEY.indexOf('%') === -1 ? GROQ_DEFAULT_KEY : '');
+  if (!key) throw new Error('NOKEY_GROQ');
+  var r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
     body: JSON.stringify({
-      model: 'grok-3-mini',
+      model: 'llama-3.3-70b-versatile',
       max_tokens: 1200,
       messages: [{ role: 'system', content: sys }, { role: 'user', content: msg }]
     })
@@ -762,7 +762,7 @@ async function callGrok(sys, msg) {
 }
 
 async function callAPI(sys, msg) {
-  if (provider === 'grok') return callGrok(sys, msg);
+  if (provider === 'groq') return callGroq(sys, msg);
   return callGemini(sys, msg);
 }
 
@@ -855,8 +855,8 @@ function showErr(msg, type) {
 function handleError(err) {
   if (err.message === 'NOKEY_GEMINI') {
     showErr('Gemini nicht verfügbar. Bitte Seite neu laden oder später erneut versuchen.', 'warn');
-  } else if (err.message === 'NOKEY_GROK') {
-    showErr('Grok nicht verfügbar. Bitte Seite neu laden oder später erneut versuchen.', 'warn');
+  } else if (err.message === 'NOKEY_GROQ') {
+    showErr('Groq nicht verfügbar. Bitte Seite neu laden oder später erneut versuchen.', 'warn');
   } else if (err.message.indexOf('API_KEY_INVALID') !== -1 || err.message.indexOf('401') !== -1) {
     showErr('API Key ungültig. Bitte Key prüfen und neu eingeben.', 'err');
   } else if (err.message.indexOf('429') !== -1 || err.message.indexOf('RESOURCE_EXHAUSTED') !== -1) {
