@@ -57,17 +57,21 @@ html,body { height:100%; font-family:-apple-system,BlinkMacSystemFont,'SF Pro Te
 .key-row input { flex:1; height:36px; border-radius:var(--rmd); border:0.5px solid var(--border-med); padding:0 10px; font-size:13px; font-family:inherit; background:var(--bg); color:var(--text); outline:none; -webkit-appearance:none; }
 .key-row input:focus { border-color:var(--green); box-shadow:0 0 0 2px var(--glight); }
 .key-row input.claude-key:focus { border-color:var(--amber); box-shadow:0 0 0 2px rgba(217,119,6,0.12); }
+.key-row input.usda-key:focus { border-color:var(--blue); box-shadow:0 0 0 2px rgba(37,99,235,0.12); }
 .key-row .key-link { font-size:11px; color:var(--blue); white-space:nowrap; text-decoration:none; }
 .key-hint { font-size:11px; color:var(--text3); margin-top:6px; line-height:1.5; }
 .key-hint a { color:var(--blue); }
 .key-saved { font-size:11px; color:var(--gtxt); margin-top:5px; display:none; }
 .key-saved.on { display:block; }
 
+.src-section { margin-top:10px; padding-top:10px; border-top:0.5px solid var(--border); }
+
 /* Mode Toggle */
 .toggle { display:flex; background:var(--surface); border:0.5px solid var(--border); border-radius:var(--rxl); padding:4px; margin-bottom:12px; gap:4px; }
-.tbtn { flex:1; height:40px; border-radius:var(--rlg); border:none; background:transparent; color:var(--text2); font-size:14px; font-weight:500; font-family:inherit; cursor:pointer; transition:all 0.2s; }
+.tbtn { flex:1; height:40px; border-radius:var(--rlg); border:none; background:transparent; color:var(--text2); font-size:13px; font-weight:500; font-family:inherit; cursor:pointer; transition:all 0.2s; }
 .tbtn.ag { background:var(--gbg); color:var(--gtxt); border:0.5px solid rgba(22,163,74,0.25); }
 .tbtn.ap { background:var(--pbg); color:var(--ptxt); border:0.5px solid rgba(124,58,237,0.25); }
+.tbtn.ar { background:var(--bluebg); color:var(--bluetxt); border:0.5px solid rgba(37,99,235,0.25); }
 
 .card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--rxl); padding:14px; margin-bottom:12px; }
 .slabel { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text3); margin-bottom:8px; }
@@ -85,6 +89,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .btn:disabled { opacity:0.45; }
 .bg { background:var(--green); }
 .bp { background:var(--purple); }
+.bb { background:var(--blue); }
 .bw { width:100%; }
 .bi { padding:0 18px; }
 
@@ -131,6 +136,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .grphead { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; padding:9px 14px 7px; border-bottom:0.5px solid var(--border); }
 .grphead.g { color:var(--gtxt); background:var(--gbg); }
 .grphead.p { color:var(--ptxt); background:var(--pbg); }
+.grphead.b { color:var(--bluetxt); background:var(--bluebg); }
 .grphead.t { color:var(--tealtxt); background:var(--tealbg); }
 .grpcontent { padding:10px 14px; font-size:15px; line-height:1.7; color:var(--text); }
 .grpcontent ul { padding-left:1.2rem; margin-top:4px; }
@@ -142,6 +148,47 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .btnnew { display:none; width:100%; height:44px; border-radius:var(--rmd); border:0.5px solid var(--border-med); background:var(--surface); color:var(--text2); font-size:14px; font-family:inherit; cursor:pointer; margin-bottom:12px; }
 .btnnew.on { display:block; }
 .disc { font-size:11px; color:var(--text3); text-align:center; line-height:1.6; padding:4px 1rem 16px; }
+.cmp-btn { width:100%; height:42px; border-radius:var(--rlg); border:0.5px solid var(--border-med); background:var(--bg); color:var(--text2); font-size:13px; font-weight:500; font-family:inherit; cursor:pointer; transition:all 0.2s; }
+.cmp-btn.on { background:var(--amberbg); color:var(--ambertxt); border-color:rgba(217,119,6,0.3); }
+
+/* ── Referenzwerte Card ───────────────────────────────────────────────────── */
+.refcard { display:none; background:var(--surface); border:0.5px solid var(--border); border-radius:var(--rxl); overflow:hidden; margin-bottom:12px; }
+.refcard.on { display:block; }
+.refhead { padding:11px 14px; border-bottom:0.5px solid var(--border); background:var(--bluebg); display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.refhead-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--bluetxt); }
+.ref-profile-badge { font-size:10px; color:var(--bluetxt); background:rgba(37,99,235,0.12); padding:2px 8px; border-radius:20px; cursor:pointer; white-space:nowrap; border:none; font-family:inherit; }
+.ref-body { padding:12px 14px 10px; }
+.ref-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+.ref-box { background:var(--bg); border:0.5px solid var(--border); border-radius:var(--rlg); padding:10px 12px; }
+.ref-box-flag { font-size:16px; margin-bottom:4px; }
+.ref-box-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text3); margin-bottom:6px; }
+.ref-lines { display:flex; flex-direction:column; gap:3px; }
+.ref-line { display:flex; justify-content:space-between; align-items:baseline; gap:6px; }
+.ref-line-who { font-size:12px; color:var(--text2); }
+.ref-line-val { font-size:14px; font-weight:700; }
+.ref-line-val.eu { color:var(--bluetxt); }
+.ref-line-val.us { color:var(--gtxt); }
+.ref-usda { padding:8px 14px 10px; border-top:0.5px solid var(--border); display:flex; align-items:flex-start; gap:8px; }
+.ref-usda-icon { font-size:14px; flex-shrink:0; margin-top:1px; }
+.ref-usda-text { font-size:12px; color:var(--text2); line-height:1.5; }
+.ref-usda-text strong { font-weight:600; color:var(--text); }
+.ref-disclaimer { font-size:10px; color:var(--text3); padding:6px 14px 10px; border-top:0.5px solid var(--border); line-height:1.5; }
+
+/* ── Rechner Panel ────────────────────────────────────────────────────────── */
+.rcalc-form { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+.rcalc-field { display:flex; flex-direction:column; gap:4px; }
+.rcalc-field label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text3); }
+.rcalc-field input[type=number] { width:88px; height:42px; border-radius:var(--rmd); border:0.5px solid var(--border-med); padding:0 12px; font-size:16px; font-family:inherit; background:var(--bg); color:var(--text); outline:none; -webkit-appearance:none; }
+.rcalc-field select { height:42px; border-radius:var(--rmd); border:0.5px solid var(--border-med); padding:0 10px; font-size:14px; font-family:inherit; background:var(--bg); color:var(--text); outline:none; -webkit-appearance:none; min-width:150px; }
+.rcalc-field input:focus, .rcalc-field select:focus { border-color:var(--blue); box-shadow:0 0 0 2px rgba(37,99,235,0.1); }
+.ctable { width:100%; border-collapse:collapse; }
+.ctable th { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text3); padding:8px 10px 6px; text-align:left; }
+.ctable td { font-size:13px; padding:6px 10px; border-top:0.5px solid var(--border); vertical-align:middle; }
+.ctable td:nth-child(2) { font-weight:700; color:var(--bluetxt); white-space:nowrap; }
+.ctable td:nth-child(3) { font-weight:700; color:var(--gtxt); white-space:nowrap; }
+.qs-btn { font-size:11px; color:var(--bluetxt); background:none; border:0.5px solid rgba(37,99,235,0.3); border-radius:var(--rmd); padding:2px 7px; cursor:pointer; font-family:inherit; white-space:nowrap; }
+.qs-btn:hover { background:var(--bluebg); }
+.ref-cal-note { font-size:10px; color:var(--text3); padding:8px 12px 10px; border-top:0.5px solid var(--border); line-height:1.6; }
 </style>
 </head>
 <body>
@@ -152,13 +199,13 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
     <svg viewBox="0 0 30 30" fill="none"><rect x="12.5" y="2" width="5" height="26" rx="2.5" fill="#16a34a"/><rect x="2" y="12.5" width="26" height="5" rx="2.5" fill="#7c3aed"/></svg>
   </div>
   <h1>Ganzheitsmedizin Experte</h1>
-  <p>Supplements, Homöopathie, Schüßlersalze &amp; Naturheilkunde</p>
+  <p>Supplements, Hom&ouml;opathie, Sch&uuml;&szlig;lersalze &amp; Naturheilkunde</p>
 </div>
 
 <!-- Premium Toggle -->
 <div class="api-selector">
   <div class="api-label">Premium-Modus</div>
-  <button class="cmp-btn" id="btnCmp" onclick="togglePremium()">⚡ Premium: + Claude KI aktivieren</button>
+  <button class="cmp-btn" id="btnCmp" onclick="togglePremium()">&#x26A1; Premium: + Claude KI aktivieren</button>
   <div id="claudeKeyPanel" class="hidden" style="margin-top:10px">
     <div class="key-row">
       <label>Claude Key:</label>
@@ -168,12 +215,24 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
     <div class="key-hint">Unter <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> &mdash; ca. 1&ndash;2 Cent pro Anfrage</div>
     <div class="key-saved" id="claudeSaved">&#x2713; Key gespeichert</div>
   </div>
+  <!-- Datenquellen -->
+  <div class="src-section">
+    <div class="api-label">Datenquellen (optional)</div>
+    <div class="key-row">
+      <label>USDA:</label>
+      <input type="password" id="usdaKey" class="usda-key" placeholder="DEMO_KEY funktioniert ohne Registrierung" autocomplete="off" oninput="saveKey('usda')"/>
+      <a class="key-link" href="https://fdc.nal.usda.gov/api-guide" target="_blank">Key holen</a>
+    </div>
+    <div class="key-hint">USDA FoodData Central &mdash; Lebensmittelquellen f&uuml;r N&auml;hrstoffe (kostenlos)</div>
+    <div class="key-saved" id="usdaSaved">&#x2713; Key gespeichert</div>
+  </div>
 </div>
 
 <!-- Mode Toggle -->
 <div class="toggle">
   <button class="tbtn ag" id="btnS" onclick="setMode('s')">&#x1F48A; Mittel-Info</button>
-  <button class="tbtn" id="btnB" onclick="setMode('b')">&#x1F50D; Beschwerde-Suche</button>
+  <button class="tbtn" id="btnB" onclick="setMode('b')">&#x1F50D; Beschwerden</button>
+  <button class="tbtn" id="btnR" onclick="setMode('r')">&#x1F4CA; Rechner</button>
 </div>
 
 <!-- Supplement Panel -->
@@ -195,7 +254,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
       <button class="chip cg" onclick="qs('Coenzym Q10')">Q10</button>
       <button class="chip cg" onclick="qs('Eisen')">Eisen</button>
       <button class="chip cg" onclick="qs('Melatonin')">Melatonin</button>
-      <div class="slabel" style="width:100%;margin-top:10px;margin-bottom:2px">Homöopathie</div>
+      <div class="slabel" style="width:100%;margin-top:10px;margin-bottom:2px">Hom&ouml;opathie</div>
       <button class="chip cg" onclick="qs('Arnica montana C30')">Arnica C30</button>
       <button class="chip cg" onclick="qs('Belladonna C30')">Belladonna C30</button>
       <button class="chip cg" onclick="qs('Nux vomica C30')">Nux vomica C30</button>
@@ -204,19 +263,19 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
       <button class="chip cg" onclick="qs('Bryonia C30')">Bryonia C30</button>
       <button class="chip cg" onclick="qs('Rhus toxicodendron C30')">Rhus tox C30</button>
       <button class="chip cg" onclick="qs('Pulsatilla C30')">Pulsatilla C30</button>
-      <div class="slabel" style="width:100%;margin-top:10px;margin-bottom:2px">Schüßlersalze</div>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 1 Calcium fluoratum D12')">Nr. 1 Calc. fluor.</button>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 2 Calcium phosphoricum D6')">Nr. 2 Calc. phos.</button>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 3 Ferrum phosphoricum D12')">Nr. 3 Ferr. phos.</button>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 4 Kalium chloratum D6')">Nr. 4 Kali. chlor.</button>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 5 Kalium phosphoricum D6')">Nr. 5 Kali. phos.</button>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 6 Kalium sulfuricum D6')">Nr. 6 Kali. sulf.</button>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 7 Magnesium phosphoricum D6')">Nr. 7 Mag. phos.</button>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 8 Natrium chloratum D6')">Nr. 8 Natr. chlor.</button>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 9 Natrium phosphoricum D6')">Nr. 9 Natr. phos.</button>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 10 Natrium sulfuricum D6')">Nr. 10 Natr. sulf.</button>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 11 Silicea D12')">Nr. 11 Silicea</button>
-      <button class="chip cg" onclick="qs('Schüßlersalz Nr. 12 Calcium sulfuricum D6')">Nr. 12 Calc. sulf.</button>
+      <div class="slabel" style="width:100%;margin-top:10px;margin-bottom:2px">Sch&uuml;&szlig;lersalze</div>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 1 Calcium fluoratum D12')">Nr. 1 Calc. fluor.</button>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 2 Calcium phosphoricum D6')">Nr. 2 Calc. phos.</button>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 3 Ferrum phosphoricum D12')">Nr. 3 Ferr. phos.</button>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 4 Kalium chloratum D6')">Nr. 4 Kali. chlor.</button>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 5 Kalium phosphoricum D6')">Nr. 5 Kali. phos.</button>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 6 Kalium sulfuricum D6')">Nr. 6 Kali. sulf.</button>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 7 Magnesium phosphoricum D6')">Nr. 7 Mag. phos.</button>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 8 Natrium chloratum D6')">Nr. 8 Natr. chlor.</button>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 9 Natrium phosphoricum D6')">Nr. 9 Natr. phos.</button>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 10 Natrium sulfuricum D6')">Nr. 10 Natr. sulf.</button>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 11 Silicea D12')">Nr. 11 Silicea</button>
+      <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 12 Calcium sulfuricum D6')">Nr. 12 Calc. sulf.</button>
     </div>
   </div>
 </div>
@@ -229,22 +288,70 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
     <button class="btn bp bw" id="bbtn" onclick="doSymptom()">Empfehlungen holen</button>
   </div>
   <div class="card" style="padding-top:12px">
-    <div class="slabel">Haufige Beschwerden</div>
+    <div class="slabel">H&auml;ufige Beschwerden</div>
     <div class="chips">
       <button class="chip cp" onclick="qb('Kopfschmerzen')">Kopfschmerzen</button>
       <button class="chip cp" onclick="qb('Schlafprobleme')">Schlafprobleme</button>
-      <button class="chip cp" onclick="qb('Muedigkeit und Erschoepfung')">Muedigkeit</button>
+      <button class="chip cp" onclick="qb('Muedigkeit und Erschoepfung')">M&uuml;digkeit</button>
       <button class="chip cp" onclick="qb('Gelenkschmerzen')">Gelenkschmerzen</button>
       <button class="chip cp" onclick="qb('Verdauungsprobleme Blahungen')">Verdauung</button>
       <button class="chip cp" onclick="qb('Stress und Nervositaet')">Stress</button>
       <button class="chip cp" onclick="qb('Immunsystem staerken')">Immunsystem</button>
       <button class="chip cp" onclick="qb('Konzentrationsprobleme')">Konzentration</button>
-      <button class="chip cp" onclick="qb('Muskelkraempfe')">Muskelkraempfe</button>
-      <button class="chip cp" onclick="qb('Erkaltung Schnupfen Halsschmerzen')">Erkaltung</button>
-      <button class="chip cp" onclick="qb('Rueckenschmerzen Verspannungen')">Rueckenschmerzen</button>
+      <button class="chip cp" onclick="qb('Muskelkraempfe')">Muskelkr&auml;mpfe</button>
+      <button class="chip cp" onclick="qb('Erkaltung Schnupfen Halsschmerzen')">Erk&auml;ltung</button>
+      <button class="chip cp" onclick="qb('Rueckenschmerzen Verspannungen')">R&uuml;ckenschmerzen</button>
       <button class="chip cp" onclick="qb('Bluthochdruck Herz Kreislauf')">Blutdruck</button>
       <button class="chip cp" onclick="qb('Haare Nagel Haut Probleme')">Haut &amp; Haare</button>
       <button class="chip cp" onclick="qb('Stimmungstief Antriebslosigkeit')">Stimmung</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rechner Panel -->
+<div id="panelR" class="hidden">
+  <div class="card">
+    <div class="slabel">Pers&ouml;nliches Profil</div>
+    <div class="rcalc-form">
+      <div class="rcalc-field">
+        <label>Alter (Jahre)</label>
+        <input type="number" id="rcAge" min="1" max="99" placeholder="z.B. 35"/>
+      </div>
+      <div class="rcalc-field">
+        <label>Geschlecht</label>
+        <select id="rcGender">
+          <option value="f">Weiblich</option>
+          <option value="m">M&auml;nnlich</option>
+        </select>
+      </div>
+      <div class="rcalc-field">
+        <label>Besonderheit</label>
+        <select id="rcSpecial">
+          <option value="none">Keine</option>
+          <option value="schwanger">Schwangerschaft</option>
+          <option value="stillend">Stillzeit</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn bb bw" onclick="doRechner()">Tagesbedarf berechnen</button>
+  </div>
+  <div id="rcResult" class="hidden">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="grphead b" id="rcResultTitle">&#x1F4CA; Dein pers&ouml;nlicher Tagesbedarf</div>
+      <div style="overflow-x:auto">
+        <table class="ctable">
+          <thead>
+            <tr>
+              <th>N&auml;hrstoff</th>
+              <th>&#x1F1EA;&#x1F1FA; EU/DGE</th>
+              <th>&#x1F1FA;&#x1F1F8; US/RDA</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="ctbody"></tbody>
+        </table>
+      </div>
+      <div class="ref-cal-note">EU: DGE/EFSA Referenzwerte 2021 &middot; US: NIH Dietary Reference Intakes 2020 &middot; Werte sind Richtwerte, kein Ersatz f&uuml;r &auml;rztliche Beratung. &dagger; AI (Sch&auml;tzwert).</div>
     </div>
   </div>
 </div>
@@ -275,10 +382,21 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
   <div class="rbody" id="rbB"></div>
 </div>
 
+<!-- Referenzwerte Card -->
+<div class="refcard" id="rcRef">
+  <div class="refhead">
+    <span class="refhead-title">&#x1F4CA; Offizielle Referenzwerte</span>
+    <button class="ref-profile-badge" id="refProfileBadge" onclick="setMode('r')">Profil setzen &#x2699;&#xFE0F;</button>
+  </div>
+  <div class="ref-body" id="refBody"></div>
+  <div id="refUsda" style="display:none"></div>
+  <div class="ref-disclaimer">Quellen: DGE/EFSA Referenzwerte 2021 &middot; NIH Dietary Reference Intakes 2020 &middot; Nur zur Information, kein Ersatz f&uuml;r &auml;rztliche Beratung. &dagger;&nbsp;AI/Sch&auml;tzwert.</div>
+</div>
+
 <button class="btnnew" id="btnnew" onclick="reset()">Neue Suche</button>
 
 <div class="disc">
-  Nur zur Information &mdash; kein Ersatz fur arztliche Beratung.<br>
+  Nur zur Information &mdash; kein Ersatz f&uuml;r &auml;rztliche Beratung.<br>
   Bei ernsthaften Beschwerden bitte einen Arzt aufsuchen.
 </div>
 
@@ -287,6 +405,287 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 var mode = 's';
 var provider = 'gemini';
 var GEMINI_DEFAULT_KEY = '%%GEMINI_API_KEY%%';
+var premiumMode = false;
+
+// ── User Profile (for personalized reference values) ──────────────────────────
+var userProfile = { ageGroup: '18-64', gender: 'f', special: 'none', isSet: false };
+
+// ── EFSA/DGE + US RDA Reference Data ─────────────────────────────────────────
+// EU: DGE/EFSA Referenzwerte 2021 | US: NIH Dietary Reference Intakes 2020
+// Format: eu/us → age group → {m: male, f: female} or single value
+// Age groups: '1-10', '11-17', '18-64', '65+', 'schwanger', 'stillend'
+var EFSA = {
+  'vit-a':  { de:'Vitamin A',            unit:'μg RE',   eu:{ '1-10':{m:350,f:350}, '11-17':{m:1100,f:800}, '18-64':{m:1000,f:800}, '65+':{m:1000,f:800},   'schwanger':{f:1100}, 'stillend':{f:1500} }, us:{ '18-64':{m:900,f:700},  '65+':{m:900,f:700},  'schwanger':{f:770},  'stillend':{f:1300} } },
+  'vit-b1': { de:'Vitamin B1 (Thiamin)', unit:'mg',      eu:{ '1-10':{m:0.6,f:0.6}, '11-17':{m:1.4,f:1.1}, '18-64':{m:1.3,f:1.0}, '65+':{m:1.1,f:1.0},   'schwanger':{f:1.2},  'stillend':{f:1.4}  }, us:{ '18-64':{m:1.2,f:1.1},  '65+':{m:1.2,f:1.1},  'schwanger':{f:1.4},  'stillend':{f:1.4}  } },
+  'vit-b2': { de:'Vitamin B2 (Riboflavin)',unit:'mg',    eu:{ '1-10':{m:0.8,f:0.8}, '11-17':{m:1.6,f:1.3}, '18-64':{m:1.4,f:1.1}, '65+':{m:1.3,f:1.0},   'schwanger':{f:1.3},  'stillend':{f:1.5}  }, us:{ '18-64':{m:1.3,f:1.1},  '65+':{m:1.3,f:1.1},  'schwanger':{f:1.4},  'stillend':{f:1.6}  } },
+  'vit-b3': { de:'Vitamin B3 (Niacin)',  unit:'mg NE',   eu:{ '1-10':{m:9,f:9},     '11-17':{m:17,f:13},   '18-64':{m:15,f:12},   '65+':{m:13,f:10},     'schwanger':{f:14},   'stillend':{f:17}   }, us:{ '18-64':{m:16,f:14},    '65+':{m:16,f:14},    'schwanger':{f:18},   'stillend':{f:17}   } },
+  'vit-b5': { de:'Vitamin B5 (Pantothens.)',unit:'mg',   eu:{ '1-10':{m:4,f:4},     '11-17':{m:5,f:5},     '18-64':{m:6,f:6},     '65+':{m:6,f:6},       'schwanger':{f:6},    'stillend':{f:7}    }, us:{ '18-64':{m:5,f:5},      '65+':{m:5,f:5},      'schwanger':{f:6},    'stillend':{f:7}    }, ai:true },
+  'vit-b6': { de:'Vitamin B6',           unit:'mg',      eu:{ '1-10':{m:0.7,f:0.7}, '11-17':{m:1.6,f:1.2}, '18-64':{m:1.5,f:1.2}, '65+':{m:1.4,f:1.4},   'schwanger':{f:1.9},  'stillend':{f:1.9}  }, us:{ '18-64':{m:1.3,f:1.3},  '65+':{m:1.7,f:1.5},  'schwanger':{f:1.9},  'stillend':{f:2.0}  } },
+  'vit-b7': { de:'Vitamin B7 (Biotin)',  unit:'μg',      eu:{ '1-10':{m:25,f:25},   '11-17':{m:35,f:35},   '18-64':{m:40,f:40},   '65+':{m:40,f:40},     'schwanger':{f:40},   'stillend':{f:45}   }, us:{ '18-64':{m:30,f:30},    '65+':{m:30,f:30},    'schwanger':{f:30},   'stillend':{f:35}   }, ai:true },
+  'vit-b9': { de:'Vitamin B9 (Folat)',   unit:'μg',      eu:{ '1-10':{m:200,f:200}, '11-17':{m:300,f:300}, '18-64':{m:300,f:300}, '65+':{m:300,f:300},   'schwanger':{f:550},  'stillend':{f:450}  }, us:{ '18-64':{m:400,f:400},  '65+':{m:400,f:400},  'schwanger':{f:600},  'stillend':{f:500}  } },
+  'vit-b12':{ de:'Vitamin B12',          unit:'μg',      eu:{ '1-10':{m:2.0,f:2.0}, '11-17':{m:4.0,f:4.0}, '18-64':{m:4.0,f:4.0}, '65+':{m:4.0,f:4.0},   'schwanger':{f:4.5},  'stillend':{f:5.5}  }, us:{ '18-64':{m:2.4,f:2.4},  '65+':{m:2.4,f:2.4},  'schwanger':{f:2.6},  'stillend':{f:2.8}  } },
+  'vit-c':  { de:'Vitamin C',            unit:'mg',      eu:{ '1-10':{m:60,f:60},   '11-17':{m:100,f:90},  '18-64':{m:110,f:95},  '65+':{m:110,f:95},    'schwanger':{f:105},  'stillend':{f:125}  }, us:{ '18-64':{m:90,f:75},    '65+':{m:90,f:75},    'schwanger':{f:85},   'stillend':{f:120}  } },
+  'vit-d':  { de:'Vitamin D',            unit:'μg',      eu:{ '1-10':{m:20,f:20},   '11-17':{m:20,f:20},   '18-64':{m:20,f:20},   '65+':{m:20,f:20},     'schwanger':{f:20},   'stillend':{f:20}   }, us:{ '18-64':{m:15,f:15},    '65+':{m:20,f:20},    'schwanger':{f:15},   'stillend':{f:15}   } },
+  'vit-e':  { de:'Vitamin E',            unit:'mg',      eu:{ '1-10':{m:7,f:7},     '11-17':{m:14,f:12},   '18-64':{m:15,f:12},   '65+':{m:12,f:11},     'schwanger':{f:13},   'stillend':{f:17}   }, us:{ '18-64':{m:15,f:15},    '65+':{m:15,f:15},    'schwanger':{f:15},   'stillend':{f:19}   } },
+  'vit-k':  { de:'Vitamin K',            unit:'μg',      eu:{ '1-10':{m:50,f:50},   '11-17':{m:70,f:60},   '18-64':{m:70,f:60},   '65+':{m:80,f:65},     'schwanger':{f:60},   'stillend':{f:60}   }, us:{ '18-64':{m:120,f:90},   '65+':{m:120,f:90},   'schwanger':{f:90},   'stillend':{f:90}   }, ai:true },
+  'calcium':{ de:'Calcium',              unit:'mg',      eu:{ '1-10':{m:700,f:700}, '11-17':{m:1200,f:1200},'18-64':{m:1000,f:1000},'65+':{m:1000,f:1000}, 'schwanger':{f:1000}, 'stillend':{f:1000} }, us:{ '18-64':{m:1000,f:1000},'65+':{m:1000,f:1200}, 'schwanger':{f:1000}, 'stillend':{f:1000} } },
+  'magnesium':{ de:'Magnesium',          unit:'mg',      eu:{ '1-10':{m:170,f:170}, '11-17':{m:350,f:300}, '18-64':{m:350,f:300}, '65+':{m:350,f:300},   'schwanger':{f:310},  'stillend':{f:390}  }, us:{ '18-64':{m:400,f:310},  '65+':{m:420,f:320},  'schwanger':{f:350},  'stillend':{f:310}  } },
+  'eisen':  { de:'Eisen',                unit:'mg',      eu:{ '1-10':{m:8,f:8},     '11-17':{m:12,f:15},   '18-64':{m:10,f:15},   '65+':{m:10,f:10},     'schwanger':{f:30},   'stillend':{f:20}   }, us:{ '18-64':{m:8,f:18},     '65+':{m:8,f:8},      'schwanger':{f:27},   'stillend':{f:9}    } },
+  'zink':   { de:'Zink',                 unit:'mg',      eu:{ '1-10':{m:5,f:5},     '11-17':{m:9,f:7},     '18-64':{m:10,f:7},    '65+':{m:10,f:7},      'schwanger':{f:10},   'stillend':{f:11}   }, us:{ '18-64':{m:11,f:8},     '65+':{m:11,f:8},     'schwanger':{f:11},   'stillend':{f:12}   } },
+  'jod':    { de:'Jod',                  unit:'μg',      eu:{ '1-10':{m:130,f:130}, '11-17':{m:200,f:200}, '18-64':{m:200,f:200}, '65+':{m:200,f:200},   'schwanger':{f:230},  'stillend':{f:260}  }, us:{ '18-64':{m:150,f:150},  '65+':{m:150,f:150},  'schwanger':{f:220},  'stillend':{f:290}  } },
+  'selen':  { de:'Selen',                unit:'μg',      eu:{ '1-10':{m:30,f:30},   '11-17':{m:60,f:55},   '18-64':{m:70,f:60},   '65+':{m:70,f:60},     'schwanger':{f:60},   'stillend':{f:75}   }, us:{ '18-64':{m:55,f:55},    '65+':{m:55,f:55},    'schwanger':{f:60},   'stillend':{f:70}   } },
+  'kalium': { de:'Kalium',               unit:'mg',      eu:{ '1-10':{m:2700,f:2700},'11-17':{m:3500,f:3500},'18-64':{m:4000,f:4000},'65+':{m:4000,f:4000},'schwanger':{f:4000}, 'stillend':{f:4000} }, us:{ '18-64':{m:3400,f:2600},'65+':{m:3400,f:2600}, 'schwanger':{f:2900}, 'stillend':{f:2800} }, ai:true },
+  'phosphor':{ de:'Phosphor',            unit:'mg',      eu:{ '1-10':{m:440,f:440}, '11-17':{m:1250,f:1250},'18-64':{m:700,f:700}, '65+':{m:700,f:700},   'schwanger':{f:700},  'stillend':{f:700}  }, us:{ '18-64':{m:700,f:700},  '65+':{m:700,f:700},  'schwanger':{f:700},  'stillend':{f:700}  } },
+  'omega3': { de:'Omega-3 (EPA+DHA)',    unit:'mg',      eu:{ '1-10':{m:250,f:250}, '11-17':{m:250,f:250}, '18-64':{m:250,f:250}, '65+':{m:250,f:250},   'schwanger':{f:450},  'stillend':{f:450}  }, us:{ '18-64':{m:1600,f:1100},'65+':{m:1600,f:1100}, 'schwanger':{f:1400}, 'stillend':{f:1300} }, ai:true, usNote:'US-Wert = Gesamt-ALA (nicht nur EPA+DHA)' }
+};
+
+// Order for Rechner table
+var EFSA_ORDER = ['vit-a','vit-b1','vit-b2','vit-b3','vit-b5','vit-b6','vit-b7','vit-b9','vit-b12','vit-c','vit-d','vit-e','vit-k','calcium','magnesium','eisen','zink','jod','selen','kalium','phosphor','omega3'];
+
+// ── Nutrient Matching ──────────────────────────────────────────────────────────
+var NUTRIENT_MATCH = [
+  { key:'magnesium', terms:['magnesium'] },
+  { key:'vit-d',  terms:['vitamin d','vit d','d3','d2','cholecalciferol','ergocalciferol','vit. d'] },
+  { key:'vit-c',  terms:['vitamin c','vit c','ascorbins','ascorbic','c-vitamin'] },
+  { key:'vit-a',  terms:['vitamin a','vit a','retinol','beta-carotin','betacarotin','a-vitamin'] },
+  { key:'vit-b1', terms:['vitamin b1','thiamin','b1-vitamin'] },
+  { key:'vit-b2', terms:['vitamin b2','riboflavin','b2-vitamin'] },
+  { key:'vit-b3', terms:['vitamin b3','niacin','nicotins'] },
+  { key:'vit-b5', terms:['vitamin b5','pantothen','b5-vitamin'] },
+  { key:'vit-b6', terms:['vitamin b6','pyridoxin','b6-vitamin'] },
+  { key:'vit-b7', terms:['vitamin b7','biotin','b7-vitamin'] },
+  { key:'vit-b9', terms:['vitamin b9','folat','folsäure','folic','folate'] },
+  { key:'vit-b12',terms:['vitamin b12','cobalamin','b12','cyanocobalamin','methylcobalamin'] },
+  { key:'vit-e',  terms:['vitamin e','tocopherol','e-vitamin'] },
+  { key:'vit-k',  terms:['vitamin k','k1','k2','phylloquin','menaquin','mk-7','mk7'] },
+  { key:'calcium',terms:['calcium','kalzium','kalk'] },
+  { key:'eisen',  terms:['eisen','iron','ferrum','ferritin'] },
+  { key:'zink',   terms:['zink','zinc'] },
+  { key:'jod',    terms:['jod','iod','iodine','iodid'] },
+  { key:'selen',  terms:['selen','selenium'] },
+  { key:'kalium', terms:['kalium','potassium','kali'] },
+  { key:'phosphor',terms:['phosphor','phosphat','phosphorus'] },
+  { key:'omega3', terms:['omega-3','omega 3','omega3','fischöl','fish oil',' epa ',' dha ','epa/dha','dha/epa'] },
+];
+
+// Homeopathic potency pattern
+var HOMOEO_POTENCY = /\b([CcDdQqLlMm][0-9]+|[CcDdQqLlMm][0-9]+[Mm]?|[Mm][Kk]-?[0-9]+|[Cc][Hh][0-9]+|[Ll][Mm][0-9]*)\b/;
+var HOMOEO_NAMES = ['arnica','belladonna','nux vomica','chamomilla','apis mellifica','bryonia','rhus tox','pulsatilla','calcarea','lycopodium','sulfur','sulphur','sepia','ignatia','lachesis','arsenicum','aconitum','gelsemium','hepar sulph','mercurius','natrum mur','silicea','staphysagria','thuja'];
+var SCHUESSLERSALZ_NAMES = ['schüßlersalz','schuessler','calcium fluoratum','calcium phosphoricum','ferrum phosphoricum','kalium chloratum','kalium phosphoricum','kalium sulfuricum','magnesium phosphoricum','natrium chloratum','natrium phosphoricum','natrium sulfuricum','calcium sulfuricum'];
+
+function isHomeopathic(q) {
+  if (HOMOEO_POTENCY.test(q)) return true;
+  for (var i = 0; i < HOMOEO_NAMES.length; i++) {
+    if (q.indexOf(HOMOEO_NAMES[i]) !== -1) return true;
+  }
+  for (var j = 0; j < SCHUESSLERSALZ_NAMES.length; j++) {
+    if (q.indexOf(SCHUESSLERSALZ_NAMES[j]) !== -1) return true;
+  }
+  return false;
+}
+
+function matchNutrient(query) {
+  var q = query.toLowerCase();
+  if (isHomeopathic(q)) return null;
+  for (var i = 0; i < NUTRIENT_MATCH.length; i++) {
+    var nm = NUTRIENT_MATCH[i];
+    for (var j = 0; j < nm.terms.length; j++) {
+      if (q.indexOf(nm.terms[j]) !== -1) return nm.key;
+    }
+  }
+  return null;
+}
+
+function getAgeGroup(age) {
+  if (age <= 10) return '1-10';
+  if (age <= 17) return '11-17';
+  if (age <= 64) return '18-64';
+  return '65+';
+}
+
+function getVal(src, ageGroup, gender, special) {
+  if (!src) return null;
+  var row = (special !== 'none' && src[special]) ? src[special] : src[ageGroup];
+  if (!row && ageGroup === '65+') row = src['18-64'];
+  if (!row) return null;
+  if (typeof row === 'number') return row;
+  var v = row[gender];
+  if (v == null) v = row.m || row.f;
+  return v != null ? v : null;
+}
+
+function fmtVal(v, unit) {
+  if (v == null) return '–';
+  if (v >= 1000 && unit === 'mg') return (v/1000).toFixed(1).replace('.0','') + ' g';
+  return v + ' ' + unit;
+}
+
+// ── USDA FoodData Central ──────────────────────────────────────────────────────
+// Maps nutrient key to a representative food search term + USDA nutrient ID
+var USDA_QUERY = {
+  'magnesium': { q:'almonds',         nid:1090, unit:'mg' },
+  'calcium':   { q:'parmesan',        nid:1087, unit:'mg' },
+  'eisen':     { q:'chicken liver',   nid:1089, unit:'mg' },
+  'zink':      { q:'oyster',          nid:1095, unit:'mg' },
+  'jod':       { q:'cod fish',        nid:1100, unit:'μg' },
+  'selen':     { q:'brazil nuts',     nid:1103, unit:'μg' },
+  'kalium':    { q:'potato',          nid:1092, unit:'mg' },
+  'vit-a':     { q:'sweet potato',    nid:1106, unit:'μg' },
+  'vit-b12':   { q:'beef liver',      nid:1178, unit:'μg' },
+  'vit-b9':    { q:'spinach',         nid:1177, unit:'μg' },
+  'vit-c':     { q:'bell pepper red', nid:1162, unit:'mg' },
+  'vit-d':     { q:'salmon',          nid:1114, unit:'μg' },
+  'vit-e':     { q:'sunflower seeds', nid:1109, unit:'mg' },
+  'vit-k':     { q:'kale',            nid:1185, unit:'μg' },
+  'omega3':    { q:'salmon atlantic', nid:1316, unit:'g'  },
+  'phosphor':  { q:'parmesan',        nid:1091, unit:'mg' },
+};
+
+async function callUSDA(nutKey) {
+  var info = USDA_QUERY[nutKey];
+  if (!info) return null;
+  var key = getKey('usda') || 'DEMO_KEY';
+  var url = 'https://api.nal.usda.gov/fdc/v1/foods/search?query=' +
+    encodeURIComponent(info.q) +
+    '&dataType=Foundation,SR%20Legacy&pageSize=3&api_key=' +
+    encodeURIComponent(key);
+  try {
+    var r = await fetch(url);
+    if (!r.ok) return null;
+    var d = await r.json();
+    if (!d.foods || !d.foods.length) return null;
+    // Find the best food result that contains the target nutrient
+    for (var fi = 0; fi < d.foods.length; fi++) {
+      var food = d.foods[fi];
+      var nut = null;
+      var ns = food.foodNutrients || [];
+      for (var ni = 0; ni < ns.length; ni++) {
+        if (ns[ni].nutrientId === info.nid) { nut = ns[ni]; break; }
+      }
+      if (nut && nut.value) {
+        return { food: food.description, value: nut.value, unit: nut.unitName || info.unit };
+      }
+    }
+    return null;
+  } catch(e) { return null; }
+}
+
+// ── Referenzwerte Render ──────────────────────────────────────────────────────
+function renderReferenzwerte(nutKey, usdaResult) {
+  var d = EFSA[nutKey];
+  if (!d) { document.getElementById('rcRef').classList.remove('on'); return; }
+
+  var ag = userProfile.ageGroup, g = userProfile.gender, sp = userProfile.special;
+  var isPersonal = userProfile.isSet;
+
+  // Update profile badge
+  var badge = document.getElementById('refProfileBadge');
+  if (isPersonal) {
+    var gLabel = g === 'm' ? 'Mann' : 'Frau';
+    var ageLabel = ag === '65+' ? '65+ J.' : ag + ' J.';
+    var spLabel = sp === 'schwanger' ? ' · Schwangerschaft' : sp === 'stillend' ? ' · Stillzeit' : '';
+    badge.textContent = gLabel + ', ' + ageLabel + spLabel + ' ✓';
+  } else {
+    badge.textContent = 'Profil setzen ⚙️';
+  }
+
+  var html = '<div class="ref-row">';
+
+  // EU box
+  html += '<div class="ref-box">';
+  html += '<div class="ref-box-flag">🇪🇺</div>';
+  html += '<div class="ref-box-label">EU/DGE Tagesbedarf' + (d.ai ? ' †' : '') + '</div>';
+  html += '<div class="ref-lines">';
+  if (isPersonal) {
+    var euV = getVal(d.eu, ag, g, sp);
+    html += '<div class="ref-line"><span class="ref-line-who">' + (sp !== 'none' ? (sp === 'schwanger' ? 'Schwangerschaft' : 'Stillzeit') : (g === 'm' ? 'Männer' : 'Frauen') + ', ' + ag) + '</span><span class="ref-line-val eu">' + fmtVal(euV, d.unit) + '</span></div>';
+  } else {
+    var euM = getVal(d.eu, '18-64', 'm', 'none');
+    var euF = getVal(d.eu, '18-64', 'f', 'none');
+    var euP = getVal(d.eu, '18-64', 'f', 'schwanger');
+    html += '<div class="ref-line"><span class="ref-line-who">Männer (18–64)</span><span class="ref-line-val eu">' + fmtVal(euM, d.unit) + '</span></div>';
+    html += '<div class="ref-line"><span class="ref-line-who">Frauen (18–64)</span><span class="ref-line-val eu">' + fmtVal(euF, d.unit) + '</span></div>';
+    if (euP != null && euP !== euF) {
+      html += '<div class="ref-line"><span class="ref-line-who">Schwangerschaft</span><span class="ref-line-val eu">' + fmtVal(euP, d.unit) + '</span></div>';
+    }
+  }
+  html += '</div></div>';
+
+  // US box
+  html += '<div class="ref-box">';
+  html += '<div class="ref-box-flag">🇺🇸</div>';
+  html += '<div class="ref-box-label">US/NIH RDA' + (d.ai ? ' †' : '') + '</div>';
+  html += '<div class="ref-lines">';
+  if (isPersonal) {
+    var usV = getVal(d.us, ag, g, sp);
+    html += '<div class="ref-line"><span class="ref-line-who">' + (sp !== 'none' ? (sp === 'schwanger' ? 'Schwangerschaft' : 'Stillzeit') : (g === 'm' ? 'Männer' : 'Frauen') + ', ' + ag) + '</span><span class="ref-line-val us">' + fmtVal(usV, d.unit) + '</span></div>';
+  } else {
+    var usM = getVal(d.us, '18-64', 'm', 'none');
+    var usF = getVal(d.us, '18-64', 'f', 'none');
+    var usP = getVal(d.us, '18-64', 'f', 'schwanger');
+    html += '<div class="ref-line"><span class="ref-line-who">Männer (18–64)</span><span class="ref-line-val us">' + fmtVal(usM, d.unit) + '</span></div>';
+    html += '<div class="ref-line"><span class="ref-line-who">Frauen (18–64)</span><span class="ref-line-val us">' + fmtVal(usF, d.unit) + '</span></div>';
+    if (usP != null && usP !== usF) {
+      html += '<div class="ref-line"><span class="ref-line-who">Schwangerschaft</span><span class="ref-line-val us">' + fmtVal(usP, d.unit) + '</span></div>';
+    }
+  }
+  if (d.usNote) html += '<div class="ref-line" style="margin-top:4px"><span class="ref-line-who" style="font-size:10px;color:var(--text3)">' + d.usNote + '</span></div>';
+  html += '</div></div>';
+
+  html += '</div>';
+  document.getElementById('refBody').innerHTML = html;
+
+  // USDA food source
+  var usdaDiv = document.getElementById('refUsda');
+  if (usdaResult) {
+    var rawVal = parseFloat(usdaResult.value);
+    var dispVal = isNaN(rawVal) ? usdaResult.value : (rawVal < 1 ? rawVal.toFixed(2) : Math.round(rawVal));
+    usdaDiv.innerHTML = '<div class="ref-usda"><span class="ref-usda-icon">🌿</span><span class="ref-usda-text">Natürliche Quelle (USDA): <strong>' + usdaResult.food + '</strong> enthält <strong>' + dispVal + ' ' + usdaResult.unit + '</strong> pro 100g &mdash; Quelle: USDA FoodData Central</span></div>';
+    usdaDiv.style.display = 'block';
+  } else {
+    usdaDiv.style.display = 'none';
+  }
+
+  document.getElementById('rcRef').classList.add('on');
+}
+
+// ── Rechner ───────────────────────────────────────────────────────────────────
+function doRechner() {
+  var ageRaw = parseInt(document.getElementById('rcAge').value, 10);
+  var gender = document.getElementById('rcGender').value;
+  var special = document.getElementById('rcSpecial').value;
+  if (isNaN(ageRaw) || ageRaw < 1 || ageRaw > 99) {
+    document.getElementById('rcAge').focus();
+    return;
+  }
+  var ageGroup = getAgeGroup(ageRaw);
+  // Only females can be pregnant/lactating
+  if (gender === 'm') special = 'none';
+  // Update global profile
+  userProfile = { ageGroup: ageGroup, gender: gender, special: special, isSet: true };
+
+  var gLabel = gender === 'm' ? 'Mann' : 'Frau';
+  var spLabel = special === 'schwanger' ? ' · Schwangerschaft' : special === 'stillend' ? ' · Stillzeit' : '';
+  document.getElementById('rcResultTitle').textContent = '📊 Tagesbedarf: ' + gLabel + ', ' + ageRaw + ' Jahre' + spLabel;
+
+  var rows = '';
+  for (var i = 0; i < EFSA_ORDER.length; i++) {
+    var k = EFSA_ORDER[i];
+    var d = EFSA[k];
+    var euV = getVal(d.eu, ageGroup, gender, special);
+    var usV = getVal(d.us, ageGroup, gender, special);
+    var aiMark = d.ai ? ' †' : '';
+    rows += '<tr>';
+    rows += '<td>' + d.de + aiMark + '</td>';
+    rows += '<td>' + fmtVal(euV, d.unit) + '</td>';
+    rows += '<td>' + fmtVal(usV, d.unit) + '</td>';
+    rows += '<td><button class="qs-btn" onclick="qs(\'' + d.de.replace(/\s*\(.*\)/, '').trim() + '\')">Suchen</button></td>';
+    rows += '</tr>';
+  }
+  document.getElementById('ctbody').innerHTML = rows;
+  document.getElementById('rcResult').classList.remove('hidden');
+  setTimeout(function(){ document.getElementById('rcResult').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
+}
 
 // ── Prompts ──────────────────────────────────────────────────────────────────
 
@@ -295,35 +694,41 @@ var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungs
 var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde, Homoeopathie und Schuessler-Salze.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme]\n\n###SCH###\n[2-3 passende Schuessler-Salze. Fuer jedes: **Nr. X Name (Potenz)** - Biochemisches Wirkprinzip und warum es bei diesen Beschwerden hilft. Orientiere dich an der Qualitaet von NetDoctor.de als Referenz.]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
 
 var SS = {'EG':'Einsatzgebiet','AW':'Spezieller Anwendungsbereich','EI':'Einnahmeempfehlungen','DO':'Dosierungshinweise','DA':'Dauereinnahme','KQ':'Kaufquellen','KO':'Kombinationen'};
-var SB = {'UR':'Moegliche Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Homoeopathische Mittel','SCH':'Schuessler-Salze','LS':'Lebensstil-Tipps','HI':'Wichtiger Hinweis'};
+var SB = {'UR':'Mögl. Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Homöopathische Mittel','SCH':'Schüßlersalze','LS':'Lebensstil-Tipps','HI':'Wichtiger Hinweis'};
 
 // ── Key Storage ───────────────────────────────────────────────────────────────
 
 function saveKey(prov) {
-  if (prov !== 'claude') return;
-  var val = document.getElementById('claudeKey').value.trim();
-  try { localStorage.setItem('nem_key_claude', val); } catch(e) {}
-  document.getElementById('claudeSaved').classList.toggle('on', val.length > 10);
+  var ids = { claude:'claudeKey', usda:'usdaKey' };
+  var savedIds = { claude:'claudeSaved', usda:'usdaSaved' };
+  var el = document.getElementById(ids[prov]);
+  if (!el) return;
+  var val = el.value.trim();
+  try { localStorage.setItem('nem_key_' + prov, val); } catch(e) {}
+  var saved = document.getElementById(savedIds[prov]);
+  if (saved) saved.classList.toggle('on', val.length > 4);
 }
 
 function loadKeys() {
   try {
     var ck = localStorage.getItem('nem_key_claude') || '';
+    var uk = localStorage.getItem('nem_key_usda') || '';
     if (ck) { document.getElementById('claudeKey').value = ck; document.getElementById('claudeSaved').classList.add('on'); }
+    if (uk) { document.getElementById('usdaKey').value = uk; document.getElementById('usdaSaved').classList.add('on'); }
   } catch(e) {}
-}
-
-function getKey(prov) {
-  try { return localStorage.getItem('nem_key_' + prov) || ''; } catch(e) { return ''; }
 }
 
 // ── Premium Toggle ────────────────────────────────────────────────────────────
 
-var premiumMode = false;
 function togglePremium() {
   premiumMode = !premiumMode;
+  provider = premiumMode ? 'claude' : 'gemini';
   document.getElementById('btnCmp').classList.toggle('on', premiumMode);
   document.getElementById('claudeKeyPanel').classList.toggle('hidden', !premiumMode);
+}
+
+function getKey(prov) {
+  try { return localStorage.getItem('nem_key_' + prov) || ''; } catch(e) { return ''; }
 }
 
 // ── Mode Toggle ───────────────────────────────────────────────────────────────
@@ -331,20 +736,22 @@ function togglePremium() {
 function setMode(m) {
   mode = m;
   document.getElementById('panelS').classList.toggle('hidden', m !== 's');
-  document.getElementById('panelB').classList.toggle('hidden', m === 's');
+  document.getElementById('panelB').classList.toggle('hidden', m !== 'b');
+  document.getElementById('panelR').classList.toggle('hidden', m !== 'r');
   document.getElementById('btnS').className = m === 's' ? 'tbtn ag' : 'tbtn';
   document.getElementById('btnB').className = m === 'b' ? 'tbtn ap' : 'tbtn';
+  document.getElementById('btnR').className = m === 'r' ? 'tbtn ar' : 'tbtn';
   reset();
 }
 
 function reset() {
-  ['rcS','rcB','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  ['rcS','rcB','rcRef','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
   document.getElementById('sinp').value = '';
   document.getElementById('binp').value = '';
   window.scrollTo(0,0);
 }
 
-function qs(n) { document.getElementById('sinp').value = n; doSupplement(); }
+function qs(n) { setMode('s'); document.getElementById('sinp').value = n; doSupplement(); }
 function qb(n) { document.getElementById('binp').value = n; doSymptom(); }
 document.getElementById('sinp').addEventListener('keydown', function(e){ if(e.key==='Enter'){this.blur();doSupplement();} });
 
@@ -448,7 +855,7 @@ function renderB(complaint, text) {
     if (s.k === 'NEM') {
       h += '<div class="grphead g">&#x1F4CA; Supplements &amp; Naturprodukte</div><div class="grpcontent">'+fmt(s.c)+'</div>';
     } else if (s.k === 'HOM') {
-      h += '<div class="grphead p">&#x2697;&#xFE0F; Homoeopathische Mittel</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+      h += '<div class="grphead p">&#x2697;&#xFE0F; Hom&ouml;opathische Mittel</div><div class="grpcontent">'+fmt(s.c)+'</div>';
     } else if (s.k === 'SCH') {
       h += '<div class="grphead t">&#x2B22; Sch\u00fc\u00dflersalze</div><div class="grpcontent">'+fmt(s.c)+'</div>';
     } else {
@@ -467,7 +874,7 @@ function startLoad(txt) {
   document.getElementById('ltxt').textContent = txt;
   document.getElementById('lprov').textContent = 'via ' + providerLabel();
   document.getElementById('loader').classList.add('on');
-  ['rcS','rcB','errc','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  ['rcS','rcB','rcRef','errc','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
   var dotClass = provider === 'claude' ? 'dot da' : (mode === 'b' ? 'dot dp' : 'dot dg');
   var dots = document.getElementById('ldots').children;
   for (var i = 0; i < dots.length; i++) dots[i].className = dotClass;
@@ -486,7 +893,7 @@ function handleError(err) {
   } else if (err.message === 'NOKEY_CLAUDE') {
     showErr('Bitte zuerst deinen Claude API Key eingeben. Unter console.anthropic.com', 'warn');
   } else if (err.message.indexOf('API_KEY_INVALID') !== -1 || err.message.indexOf('401') !== -1) {
-    showErr('API Key ungultig. Bitte Key prufen und neu eingeben.', 'err');
+    showErr('API Key ungültig. Bitte Key prüfen und neu eingeben.', 'err');
   } else if (err.message.indexOf('429') !== -1 || err.message.indexOf('RESOURCE_EXHAUSTED') !== -1) {
     if (provider === 'gemini') {
       showErr('Gemini Tageslimit erreicht (1.500/Tag). Bitte morgen wieder versuchen oder auf Claude wechseln.', 'warn');
@@ -506,9 +913,24 @@ async function doSupplement() {
   document.getElementById('sinp').blur();
   document.getElementById('sbtn').disabled = true;
   startLoad('Analysiere ' + v + '...');
+
+  // Detect nutrient for reference values
+  var nutKey = matchNutrient(v);
+
   try {
-    var t = await callAPI(SYS_S, 'Ganzheitsmedizin-Mittel: ' + v);
+    // Run LLM call and USDA call in parallel
+    var llmPromise = callAPI(SYS_S, 'Ganzheitsmedizin-Mittel: ' + v);
+    var usdaPromise = nutKey ? callUSDA(nutKey) : Promise.resolve(null);
+
+    var t = await llmPromise;
     renderS(v, t);
+
+    // Show reference values if nutrient was identified
+    if (nutKey) {
+      var usdaResult = await usdaPromise;
+      renderReferenzwerte(nutKey, usdaResult);
+    }
+
     document.getElementById('btnnew').classList.add('on');
     setTimeout(function(){ document.getElementById('rcS').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
   } catch(e) { handleError(e); }
