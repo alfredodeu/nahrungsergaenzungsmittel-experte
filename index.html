@@ -205,16 +205,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 <!-- Premium Toggle -->
 <div class="api-selector">
   <div class="api-label">Premium-Modus</div>
-  <button class="cmp-btn" id="btnCmp" onclick="togglePremium()">&#x26A1; Premium: + Claude KI aktivieren</button>
-  <div id="claudeKeyPanel" class="hidden" style="margin-top:10px">
-    <div class="key-row">
-      <label>Claude Key:</label>
-      <input type="password" id="claudeKey" class="claude-key" placeholder="sk-ant-..." autocomplete="off" oninput="saveKey('claude')"/>
-      <a class="key-link" href="https://console.anthropic.com/settings/keys" target="_blank">Key holen</a>
-    </div>
-    <div class="key-hint">Unter <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> &mdash; ca. 1&ndash;2 Cent pro Anfrage</div>
-    <div class="key-saved" id="claudeSaved">&#x2713; Key gespeichert</div>
-  </div>
+  <button class="cmp-btn" id="btnCmp" onclick="togglePremium()">&#x26A1; Premium: + Grok KI aktivieren</button>
 </div>
 
 <!-- Mode Toggle -->
@@ -395,6 +386,7 @@ var mode = 's';
 var provider = 'gemini';
 var GEMINI_DEFAULT_KEY = '%%GEMINI_API_KEY%%';
 var USDA_DEFAULT_KEY = '%%USDA_API_KEY%%';
+var GROK_DEFAULT_KEY = '%%GROK_API_KEY%%';
 var premiumMode = false;
 
 // ── User Profile (for personalized reference values) ──────────────────────────
@@ -688,29 +680,16 @@ var SB = {'UR':'Mögl. Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Hom�
 
 // ── Key Storage ───────────────────────────────────────────────────────────────
 
-function saveKey(prov) {
-  if (prov !== 'claude') return;
-  var el = document.getElementById('claudeKey');
-  if (!el) return;
-  var val = el.value.trim();
-  try { localStorage.setItem('nem_key_claude', val); } catch(e) {}
-  document.getElementById('claudeSaved').classList.toggle('on', val.length > 4);
-}
+function saveKey(prov) { /* keys managed via GitHub Secrets */ }
 
-function loadKeys() {
-  try {
-    var ck = localStorage.getItem('nem_key_claude') || '';
-    if (ck) { document.getElementById('claudeKey').value = ck; document.getElementById('claudeSaved').classList.add('on'); }
-  } catch(e) {}
-}
+function loadKeys() { /* keys injected at deploy time */ }
 
 // ── Premium Toggle ────────────────────────────────────────────────────────────
 
 function togglePremium() {
   premiumMode = !premiumMode;
-  provider = premiumMode ? 'claude' : 'gemini';
+  provider = premiumMode ? 'grok' : 'gemini';
   document.getElementById('btnCmp').classList.toggle('on', premiumMode);
-  document.getElementById('claudeKeyPanel').classList.toggle('hidden', !premiumMode);
 }
 
 function getKey(prov) {
@@ -761,22 +740,16 @@ async function callGemini(sys, msg) {
   return d.candidates[0].content.parts[0].text;
 }
 
-async function callClaude(sys, msg) {
-  var key = getKey('claude');
-  if (!key) throw new Error('NOKEY_CLAUDE');
-  var r = await fetch('https://api.anthropic.com/v1/messages', {
+async function callGrok(sys, msg) {
+  var key = (GROK_DEFAULT_KEY.indexOf('%') === -1 ? GROK_DEFAULT_KEY : '');
+  if (!key) throw new Error('NOKEY_GROK');
+  var r = await fetch('https://api.x.ai/v1/chat/completions', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'grok-3-mini',
       max_tokens: 1200,
-      system: sys,
-      messages: [{ role: 'user', content: msg }]
+      messages: [{ role: 'system', content: sys }, { role: 'user', content: msg }]
     })
   });
   if (!r.ok) {
@@ -785,11 +758,11 @@ async function callClaude(sys, msg) {
     throw new Error(msg2);
   }
   var d = await r.json();
-  return d.content[0].text;
+  return d.choices[0].message.content;
 }
 
 async function callAPI(sys, msg) {
-  if (provider === 'claude') return callClaude(sys, msg);
+  if (provider === 'grok') return callGrok(sys, msg);
   return callGemini(sys, msg);
 }
 
@@ -882,8 +855,8 @@ function showErr(msg, type) {
 function handleError(err) {
   if (err.message === 'NOKEY_GEMINI') {
     showErr('Gemini nicht verfügbar. Bitte Seite neu laden oder später erneut versuchen.', 'warn');
-  } else if (err.message === 'NOKEY_CLAUDE') {
-    showErr('Bitte zuerst deinen Claude API Key eingeben. Unter console.anthropic.com', 'warn');
+  } else if (err.message === 'NOKEY_GROK') {
+    showErr('Grok nicht verfügbar. Bitte Seite neu laden oder später erneut versuchen.', 'warn');
   } else if (err.message.indexOf('API_KEY_INVALID') !== -1 || err.message.indexOf('401') !== -1) {
     showErr('API Key ungültig. Bitte Key prüfen und neu eingeben.', 'err');
   } else if (err.message.indexOf('429') !== -1 || err.message.indexOf('RESOURCE_EXHAUSTED') !== -1) {
