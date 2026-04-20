@@ -372,7 +372,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
     <div class="rcalc-form">
       <div class="rcalc-field">
         <label>Aktueller Wert</label>
-        <input type="number" id="vitdCurrent" min="1" max="400" placeholder="z.B. 20" style="width:96px" oninput="vitdUpdateQuick()"/>
+        <input type="number" id="vitdCurrent" min="1" max="400" placeholder="z.B. 20" style="width:96px"/>
       </div>
       <div class="rcalc-field">
         <label>Zielwert</label>
@@ -380,11 +380,11 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
       </div>
       <div class="rcalc-field">
         <label>Gewicht (kg)</label>
-        <input type="number" id="vitdWeight" min="20" max="200" placeholder="z.B. 70" style="width:96px" oninput="vitdUpdateQuick()"/>
+        <input type="number" id="vitdWeight" min="20" max="200" placeholder="z.B. 70" style="width:96px"/>
       </div>
       <div class="rcalc-field">
         <label>Alter (Jahre)</label>
-        <input type="number" id="vitdAge" min="1" max="99" placeholder="z.B. 40" style="width:96px" oninput="vitdUpdateQuick()"/>
+        <input type="number" id="vitdAge" min="1" max="99" placeholder="z.B. 40" style="width:96px"/>
       </div>
       <div class="rcalc-field">
         <label>Aufbauphase</label>
@@ -395,10 +395,6 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
           <option value="180">180 Tage</option>
         </select>
       </div>
-    </div>
-    <div id="vitdQuick" style="display:none;margin:10px 0 4px;padding:10px 14px;border-radius:var(--rmd);background:var(--bluebg);border:0.5px solid rgba(37,99,235,0.2);display:none;align-items:center;justify-content:space-between;">
-      <span style="font-size:13px;color:var(--text2);">Erhaltungsdosis</span>
-      <span id="vitdQuickVal" style="font-size:17px;font-weight:700;color:var(--bluetxt);"></span>
     </div>
     <button class="btn bb bw" onclick="doVitDRechner()">Vitamin-D-Dosis berechnen</button>
     <div id="vitdResult" style="display:none">
@@ -781,22 +777,6 @@ function doRechner() {
 
 var vitdUnit = 'ng';
 
-function vitdUpdateQuick() {
-  var weight = parseFloat(document.getElementById('vitdWeight').value);
-  var age    = parseInt(document.getElementById('vitdAge').value, 10);
-  var rawCur = parseFloat(document.getElementById('vitdCurrent').value);
-  var el = document.getElementById('vitdQuick');
-  if (isNaN(weight) || weight < 20) { el.style.display = 'none'; return; }
-  var factor = (!isNaN(age) && age >= 65) ? 60 : 40;
-  var base = weight * factor;
-  var cur = (!isNaN(rawCur) && vitdUnit === 'nmol') ? rawCur / 2.5 : rawCur;
-  var adjust = 0;
-  if (!isNaN(cur)) { if (cur < 20) adjust = 500; else if (cur > 50) adjust = -500; }
-  var erhalt = Math.round((base + adjust) / 500) * 500;
-  erhalt = Math.max(1000, Math.min(4000, erhalt));
-  document.getElementById('vitdQuickVal').textContent = erhalt.toLocaleString('de-DE') + ' IE/Tag';
-  el.style.display = 'flex';
-}
 
 function vitdSetUnit(u) {
   vitdUnit = u;
