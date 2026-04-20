@@ -118,9 +118,10 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .rhead { padding:13px 16px; border-bottom:0.5px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .rhead.g { background:var(--gbg); } .rhead.p { background:var(--pbg); }
 .rname { font-size:17px; font-weight:700; letter-spacing:-0.2px; }
-.rname.g { color:var(--gtxt); } .rname.p { color:var(--ptxt); }
+.rname.g { color:var(--gtxt); } .rname.p { color:var(--ptxt); } .rname.t { color:var(--tealtxt); }
+.rhead.t { background:var(--tealbg); }
 .rbadge { font-size:10px; font-weight:600; padding:3px 8px; border-radius:20px; color:#fff; white-space:nowrap; flex-shrink:0; display:flex; align-items:center; gap:4px; }
-.rbg { background:var(--green); } .rbp { background:var(--purple); }
+.rbg { background:var(--green); } .rbp { background:var(--purple); } .rbt { background:var(--teal); }
 .rprovider { font-size:10px; opacity:0.8; }
 
 .rbody { padding:14px 16px; }
@@ -189,6 +190,31 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .qs-btn { font-size:11px; color:var(--bluetxt); background:none; border:0.5px solid rgba(37,99,235,0.3); border-radius:var(--rmd); padding:2px 7px; cursor:pointer; font-family:inherit; white-space:nowrap; }
 .qs-btn:hover { background:var(--bluebg); }
 .ref-cal-note { font-size:10px; color:var(--text3); padding:8px 12px 10px; border-top:0.5px solid var(--border); line-height:1.6; }
+/* ── Vitamin D Rechner ──────────────────────────────────────────────────── */
+.vitd-unit-toggle { display:flex; gap:6px; margin-bottom:10px; }
+.vitd-unit-btn { font-size:12px; font-weight:600; padding:4px 12px; border-radius:20px; border:0.5px solid var(--border-med); background:var(--bg); color:var(--text2); cursor:pointer; font-family:inherit; transition:all 0.15s; }
+.vitd-unit-btn.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+.vitd-result { border-radius:var(--rxl); overflow:hidden; margin-top:14px; border:0.5px solid var(--border); }
+.vitd-result-head { padding:11px 14px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; }
+.vitd-result-head.warn { background:#fef9c3; color:#854d0e; }
+.vitd-result-head.danger { background:#fee2e2; color:#991b1b; }
+.vitd-result-head.ok { background:#dcfce7; color:#166534; }
+.vitd-result-head.optimal { background:#d1fae5; color:#065f46; }
+@media(prefers-color-scheme:dark){
+  .vitd-result-head.warn{background:#422006;color:#fde68a;}
+  .vitd-result-head.danger{background:#450a0a;color:#fca5a5;}
+  .vitd-result-head.ok{background:#052e16;color:#86efac;}
+  .vitd-result-head.optimal{background:#022c22;color:#6ee7b7;}
+}
+.vitd-rows { padding:4px 0 6px; }
+.vitd-row { display:flex; justify-content:space-between; align-items:baseline; padding:7px 14px; border-top:0.5px solid var(--border); }
+.vitd-row:first-child { border-top:none; }
+.vitd-row-label { font-size:13px; color:var(--text2); }
+.vitd-row-val { font-size:15px; font-weight:700; color:var(--bluetxt); }
+.vitd-row-val.green { color:var(--gtxt); }
+.vitd-row-val.orange { color:#d97706; }
+.vitd-row-val.red { color:#dc2626; }
+.vitd-disclaimer { font-size:10px; color:var(--text3); padding:8px 14px 10px; border-top:0.5px solid var(--border); line-height:1.6; }
 </style>
 </head>
 <body>
@@ -316,6 +342,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
     <button class="btn bb bw" onclick="doRechner()">Tagesbedarf berechnen</button>
   </div>
   <div id="rcResult" class="hidden">
+
     <div class="card" style="padding:0;overflow:hidden">
       <div class="grphead b" id="rcResultTitle">&#x1F4CA; Dein pers&ouml;nlicher Tagesbedarf</div>
       <div style="overflow-x:auto">
@@ -332,6 +359,75 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
         </table>
       </div>
       <div class="ref-cal-note">EU: DGE/EFSA Referenzwerte 2021 &middot; US: NIH Dietary Reference Intakes 2020 &middot; Werte sind Richtwerte, kein Ersatz f&uuml;r &auml;rztliche Beratung. &dagger; AI (Sch&auml;tzwert).</div>
+    </div>
+  </div>
+
+  <!-- Vitamin D Rechner -->
+  <div class="card" style="margin-top:12px">
+    <div class="slabel">&#x2600;&#xFE0F; Vitamin-D-Rechner</div>
+    <div class="vitd-unit-toggle">
+      <button class="vitd-unit-btn active" id="vitdUnitNg" onclick="vitdSetUnit('ng')">ng/ml</button>
+      <button class="vitd-unit-btn" id="vitdUnitNmol" onclick="vitdSetUnit('nmol')">nmol/L</button>
+    </div>
+    <div class="rcalc-form">
+      <div class="rcalc-field">
+        <label>Aktueller Wert</label>
+        <input type="number" id="vitdCurrent" min="1" max="400" placeholder="z.B. 20" style="width:96px" oninput="vitdUpdateQuick()"/>
+      </div>
+      <div class="rcalc-field">
+        <label>Zielwert</label>
+        <input type="number" id="vitdTarget" min="20" max="150" value="50" style="width:96px"/>
+      </div>
+      <div class="rcalc-field">
+        <label>Gewicht (kg)</label>
+        <input type="number" id="vitdWeight" min="20" max="200" placeholder="z.B. 70" style="width:96px" oninput="vitdUpdateQuick()"/>
+      </div>
+      <div class="rcalc-field">
+        <label>Alter (Jahre)</label>
+        <input type="number" id="vitdAge" min="1" max="99" placeholder="z.B. 40" style="width:96px" oninput="vitdUpdateQuick()"/>
+      </div>
+      <div class="rcalc-field">
+        <label>Aufbauphase</label>
+        <select id="vitdDays">
+          <option value="30">30 Tage</option>
+          <option value="60">60 Tage</option>
+          <option value="90" selected>90 Tage</option>
+          <option value="180">180 Tage</option>
+        </select>
+      </div>
+    </div>
+    <div id="vitdQuick" style="display:none;margin:10px 0 4px;padding:10px 14px;border-radius:var(--rmd);background:var(--bluebg);border:0.5px solid rgba(37,99,235,0.2);display:none;align-items:center;justify-content:space-between;">
+      <span style="font-size:13px;color:var(--text2);">Erhaltungsdosis</span>
+      <span id="vitdQuickVal" style="font-size:17px;font-weight:700;color:var(--bluetxt);"></span>
+    </div>
+    <button class="btn bb bw" onclick="doVitDRechner()">Vitamin-D-Dosis berechnen</button>
+    <div id="vitdResult" style="display:none">
+      <div class="vitd-result">
+        <div class="vitd-result-head" id="vitdStatusHead"></div>
+        <div class="vitd-rows">
+          <div class="vitd-row">
+            <span class="vitd-row-label">Versorgungsstatus</span>
+            <span class="vitd-row-val" id="vitdStatusVal"></span>
+          </div>
+          <div class="vitd-row">
+            <span class="vitd-row-label">Aufbaudosis (t&auml;glich)</span>
+            <span class="vitd-row-val" id="vitdAufbau"></span>
+          </div>
+          <div class="vitd-row">
+            <span class="vitd-row-label">Aufbauphase</span>
+            <span class="vitd-row-val" id="vitdDauer"></span>
+          </div>
+          <div class="vitd-row">
+            <span class="vitd-row-label">Gesamtmenge Aufbau</span>
+            <span class="vitd-row-val" id="vitdGesamt"></span>
+          </div>
+          <div class="vitd-row">
+            <span class="vitd-row-label">Erhaltungsdosis (dauerhaft)</span>
+            <span class="vitd-row-val green" id="vitdErhalt"></span>
+          </div>
+        </div>
+        <div class="vitd-disclaimer" id="vitdDisclaimer"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -360,6 +456,18 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
     <div class="rbadge rbp">Empfehlungen <span class="rprovider" id="rpB"></span></div>
   </div>
   <div class="rbody" id="rbB"></div>
+</div>
+
+<div class="rcard" id="rcDHU">
+  <div class="rhead t">
+    <div class="rname t">DHU &ndash; Deutsche Hom&ouml;opathie-Union</div>
+    <div class="rbadge rbt">Hersteller</div>
+  </div>
+  <div class="rbody">
+    <div class="rsec">
+      <div class="rscontent"><strong>DHU</strong> ist der f&uuml;hrende deutsche Hersteller f&uuml;r hom&ouml;opathische Mittel und Sch&uuml;&szlig;lersalze &ndash; von Globuli &uuml;ber Tabletten bis zu Komplexmitteln in Apothekenqualit&auml;t.<br><br><a href="https://www.dhu.de" target="_blank" rel="noopener">Produkte auf dhu.de ansehen &rarr;</a></div>
+    </div>
+  </div>
 </div>
 
 <!-- Referenzwerte Card -->
@@ -669,11 +777,106 @@ function doRechner() {
   setTimeout(function(){ document.getElementById('rcResult').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
 }
 
+// ── Vitamin D Rechner ─────────────────────────────────────────────────────────
+
+var vitdUnit = 'ng';
+
+function vitdUpdateQuick() {
+  var weight = parseFloat(document.getElementById('vitdWeight').value);
+  var age    = parseInt(document.getElementById('vitdAge').value, 10);
+  var rawCur = parseFloat(document.getElementById('vitdCurrent').value);
+  var el = document.getElementById('vitdQuick');
+  if (isNaN(weight) || weight < 20) { el.style.display = 'none'; return; }
+  var factor = (!isNaN(age) && age >= 65) ? 60 : 40;
+  var base = weight * factor;
+  var cur = (!isNaN(rawCur) && vitdUnit === 'nmol') ? rawCur / 2.5 : rawCur;
+  var adjust = 0;
+  if (!isNaN(cur)) { if (cur < 20) adjust = 500; else if (cur > 50) adjust = -500; }
+  var erhalt = Math.round((base + adjust) / 500) * 500;
+  erhalt = Math.max(1000, Math.min(4000, erhalt));
+  document.getElementById('vitdQuickVal').textContent = erhalt.toLocaleString('de-DE') + ' IE/Tag';
+  el.style.display = 'flex';
+}
+
+function vitdSetUnit(u) {
+  vitdUnit = u;
+  document.getElementById('vitdUnitNg').classList.toggle('active', u === 'ng');
+  document.getElementById('vitdUnitNmol').classList.toggle('active', u === 'nmol');
+  var cur = document.getElementById('vitdCurrent');
+  var tgt = document.getElementById('vitdTarget');
+  if (cur.value) cur.value = u === 'nmol' ? Math.round(parseFloat(cur.value) * 2.5) : Math.round(parseFloat(cur.value) / 2.5);
+  if (tgt.value) tgt.value = u === 'nmol' ? Math.round(parseFloat(tgt.value) * 2.5) : Math.round(parseFloat(tgt.value) / 2.5);
+  document.getElementById('vitdResult').style.display = 'none';
+}
+
+function doVitDRechner() {
+  var rawCur = parseFloat(document.getElementById('vitdCurrent').value);
+  var rawTgt = parseFloat(document.getElementById('vitdTarget').value);
+  var weight = parseFloat(document.getElementById('vitdWeight').value);
+  var age    = parseInt(document.getElementById('vitdAge').value, 10);
+  var days   = parseInt(document.getElementById('vitdDays').value, 10);
+
+  if (isNaN(rawCur) || isNaN(rawTgt) || isNaN(weight) || isNaN(age)) {
+    alert('Bitte alle Felder ausfüllen.');
+    return;
+  }
+
+  // Normalize to ng/ml
+  var cur = vitdUnit === 'nmol' ? rawCur / 2.5 : rawCur;
+  var tgt = vitdUnit === 'nmol' ? rawTgt / 2.5 : rawTgt;
+
+  if (tgt <= cur) { alert('Zielwert muss größer als aktueller Wert sein.'); return; }
+
+  // Aufbaudosis: (Ziel - Aktuell) × Gewicht × 40 / Tage  (Heaney/Vieth-Formel)
+  var totalIU  = (tgt - cur) * weight * 40;
+  var aufbauRaw = totalIU / days;
+  // Round to nearest 500 IU
+  var aufbau = Math.round(aufbauRaw / 500) * 500;
+  aufbau = Math.max(500, aufbau);
+
+  // Erhaltungsdosis: gewichtsbasiert, altersangepasst, blutwertkorrigiert
+  var erhaltFactor = age >= 65 ? 60 : 40;
+  var erhaltAdjust = cur < 20 ? 500 : cur > 50 ? -500 : 0;
+  var erhalt = Math.round((weight * erhaltFactor + erhaltAdjust) / 500) * 500;
+  erhalt = Math.max(1000, Math.min(4000, erhalt));
+
+  // Status
+  var statusText, statusClass, statusColor;
+  if (cur < 12)       { statusText = '⚠️ Schwerer Mangel';  statusClass = 'danger';  statusColor = 'red'; }
+  else if (cur < 20)  { statusText = '⚠️ Mangel';           statusClass = 'danger';  statusColor = 'red'; }
+  else if (cur < 30)  { statusText = '⚡ Suboptimal';        statusClass = 'warn';    statusColor = 'orange'; }
+  else if (cur < 50)  { statusText = '✓ Ausreichend';       statusClass = 'ok';      statusColor = ''; }
+  else                { statusText = '✅ Optimal';           statusClass = 'optimal'; statusColor = 'green'; }
+
+  var unitLabel = vitdUnit === 'nmol' ? 'nmol/L' : 'ng/ml';
+  var tgtLabel  = vitdUnit === 'nmol' ? Math.round(tgt * 2.5) + ' nmol/L' : tgt + ' ng/ml';
+
+  document.getElementById('vitdStatusHead').textContent = 'Aktueller Wert: ' + rawCur + ' ' + unitLabel;
+  document.getElementById('vitdStatusHead').className = 'vitd-result-head ' + statusClass;
+  document.getElementById('vitdStatusVal').textContent = statusText;
+  document.getElementById('vitdStatusVal').className = 'vitd-row-val ' + statusColor;
+  document.getElementById('vitdAufbau').textContent = aufbau.toLocaleString('de-DE') + ' IE/Tag';
+  document.getElementById('vitdDauer').textContent = days + ' Tage (Ziel: ' + tgtLabel + ')';
+  document.getElementById('vitdGesamt').textContent = Math.round(totalIU / 1000) + '.000 IE gesamt';
+  document.getElementById('vitdErhalt').textContent = erhalt.toLocaleString('de-DE') + ' IE/Tag';
+
+  var hint = cur < 30 ? 'Bei starkem Mangel bitte Blutbild nach 8–12 Wochen kontrollieren. ' : '';
+  var seniorHint = age >= 65 ? 'Ab 65 Jahren ist die Hautsynthese deutlich reduziert – regelmäßige Kontrolle empfohlen. ' : '';
+  document.getElementById('vitdDisclaimer').textContent =
+    hint + seniorHint +
+    'Formel: (Zielwert − Istwert) × Körpergewicht × 40 ÷ Tage. Erhaltungsdosis: ' + erhaltFactor + ' IE/kg' +
+    (erhaltAdjust !== 0 ? (erhaltAdjust > 0 ? ' +500 IE (niedriger Ausgangswert)' : ' −500 IE (optimaler Ausgangswert)') : '') +
+    '. Kein Ersatz für ärztliche Beratung. Obere sichere Grenze: 4.000 IE/Tag (EFSA).';
+
+  document.getElementById('vitdResult').style.display = 'block';
+  setTimeout(function(){ document.getElementById('vitdResult').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
+}
+
 // ── Prompts ──────────────────────────────────────────────────────────────────
 
-var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungsergaenzungsmittel, Homoeopathie und Schuessler-Salze.\n\nWenn nach einem Schuessler-Salz gefragt wird (z.B. Nr. 7 Magnesium phosphoricum, Calcium fluoratum, Natrium muriaticum), gib biochemische Informationen nach Dr. Wilhelm Heinrich Schuessler: Mineralstofftherapie, Wirkprinzip, Anwendungsgebiete und Einnahme als Tabletten (D6 oder D12). Orientiere dich dabei an der Qualitaet und dem Detailgrad von NetDoctor.de (netdoctor.de/naturheilkunde/schuessler-salze/) als medizinische Referenz. Erwaehne NetDoctor.de im Abschnitt Bezugsquellen als weiterfuehrende Informationsquelle. Wenn nach einem homoeopathischen Mittel gefragt wird (z.B. Arnica, Belladonna, Nux vomica, Potenzangabe wie C30), gib homoeopathische Informationen. Bei Nahrungsergaenzungsmitteln (z.B. Magnesium, Vitamin D) gib NEM-Informationen nach aktuellen DGE/EFSA 2021 und NIH 2020 Referenzwerten: Nenne stets konkrete Dosierungsbereiche in IE oder mg, erwaehne Einnahmeform (Tropfen, Kapseln, Tabletten) und Loeslichkeit (fett- oder wasserloeslich) sowie wichtige Synergisten. Passe die Abschnitte entsprechend an.\n\nGib strukturierte Informationen mit exakt diesen Trennzeichen:\n\n###EG###\n[Grobes Einsatzgebiet / Wofuer wird es verwendet – bei NEM: biochemische Funktion im Koerper kurz erlaeutern]\n\n###AW###\n[Spezieller Anwendungsbereich / Typisches Anwendungsbild]\n\n###EI###\n[Einnahmeempfehlungen: Zeitpunkt, Einnahmeform (Tropfen/Kapseln/Tabletten), Loeslichkeit (fett-/wasserloeslich), praktische Tipps]\n\n###DO###\n[Dosierungshinweise: bei NEM konkrete Werte in IE oder mg nach DGE/EFSA/NIH (z.B. Vitamin D3: 1.000–4.000 IE/Tag fuer Erwachsene); bei Homoeopathie: Potenz und Einnahmefrequenz]\n\n###DA###\n[Dauereinnahme oder Kureinnahme empfehlenswert? Begruendung, wann Blutwertkontrolle sinnvoll]\n\n###KQ###\n[Bezugsquellen: Apotheke, Drogerie, Reformhaus, Online-Shops; Hinweis auf Qualitaetsmerkmale]\n\n###KO###\n[Wichtige Synergisten und Kombinationen mit Begruendung (z.B. Vitamin D3 + K2 + Magnesium)]\n\nAuf Deutsch, klar, praxisnah und fachlich praezise.';
+var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungsergaenzungsmittel, Homoeopathie und Schuessler-Salze.\n\nWenn nach einem Schuessler-Salz gefragt wird (z.B. Nr. 7 Magnesium phosphoricum, Calcium fluoratum, Natrium muriaticum), gib biochemische Informationen nach Dr. Wilhelm Heinrich Schuessler: Mineralstofftherapie, Wirkprinzip, Anwendungsgebiete und Einnahme als Tabletten (D6 oder D12). Orientiere dich dabei an der Qualitaet und dem Detailgrad von NetDoctor.de (netdoctor.de/naturheilkunde/schuessler-salze/) als medizinische Referenz. Erwaehne NetDoctor.de im Abschnitt Bezugsquellen als weiterfuehrende Informationsquelle. Wenn nach einem homoeopathischen Mittel gefragt wird (z.B. Arnica, Belladonna, Nux vomica, Potenzangabe wie C30), gib homoeopathische Informationen. Bei Nahrungsergaenzungsmitteln (z.B. Magnesium, Vitamin D) gib NEM-Informationen nach aktuellen DGE/EFSA 2021 und NIH 2020 Referenzwerten: Nenne stets konkrete Dosierungsbereiche in IE oder mg, erwaehne Einnahmeform (Tropfen, Kapseln, Tabletten) und Loeslichkeit (fett- oder wasserloeslich) sowie wichtige Synergisten. Passe die Abschnitte entsprechend an.\n\nGib strukturierte Informationen mit exakt diesen Trennzeichen:\n\n###EG###\n[Grobes Einsatzgebiet / Wofuer wird es verwendet – bei NEM: biochemische Funktion im Koerper kurz erlaeutern]\n\n###AW###\n[Spezieller Anwendungsbereich / Typisches Anwendungsbild]\n\n###EI###\n[Einnahmeempfehlungen: Zeitpunkt, Einnahmeform (Tropfen/Kapseln/Tabletten), Loeslichkeit (fett-/wasserloeslich), praktische Tipps]\n\n###DO###\n[Dosierungshinweise: bei NEM konkrete Werte in IE oder mg nach DGE/EFSA/NIH (z.B. Vitamin D3: 1.000–4.000 IE/Tag fuer Erwachsene); bei Homoeopathie: Potenz und Einnahmefrequenz]\n\n###DA###\n[Dauereinnahme oder Kureinnahme empfehlenswert? Begruendung, wann Blutwertkontrolle sinnvoll]\n\n###KQ###\n[Bezugsquellen: Bei homoeopathischen Mitteln und Schuessler-Salzen: DHU – Deutsche Homoeopathie-Union (dhu.de) als fuehrender deutscher Hersteller in Apothekenqualitaet. Ausserdem: Apotheke, Drogerie, Reformhaus; Hinweis auf Qualitaetsmerkmale]\n\n###KO###\n[Wichtige Synergisten und Kombinationen mit Begruendung (z.B. Vitamin D3 + K2 + Magnesium)]\n\nAuf Deutsch, klar, praxisnah und fachlich praezise.';
 
-var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde, Homoeopathie und Schuessler-Salze.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme]\n\n###SCH###\n[2-3 passende Schuessler-Salze. Fuer jedes: **Nr. X Name (Potenz)** - Biochemisches Wirkprinzip und warum es bei diesen Beschwerden hilft. Orientiere dich an der Qualitaet von NetDoctor.de als Referenz.]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
+var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde, Homoeopathie und Schuessler-Salze.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme. Hinweis: DHU (dhu.de) ist der fuehrende deutsche Hersteller.]\n\n###SCH###\n[2-3 passende Schuessler-Salze. Fuer jedes: **Nr. X Name (Potenz)** - Biochemisches Wirkprinzip und warum es bei diesen Beschwerden hilft. Orientiere dich an der Qualitaet von NetDoctor.de als Referenz. Hinweis: DHU (dhu.de) ist der fuehrende Hersteller in Deutschland.]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
 
 var SS = {'EG':'Einsatzgebiet','AW':'Spezieller Anwendungsbereich','EI':'Einnahmeempfehlungen','DO':'Dosierungshinweise','DA':'Dauereinnahme','KQ':'Kaufquellen','KO':'Kombinationen'};
 var SB = {'UR':'Mögl. Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Homöopathische Mittel','SCH':'Schüßlersalze','LS':'Lebensstil-Tipps','HI':'Wichtiger Hinweis'};
@@ -710,7 +913,7 @@ function setMode(m) {
 }
 
 function reset() {
-  ['rcS','rcB','rcRef','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  ['rcS','rcB','rcDHU','rcRef','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
   document.getElementById('sinp').value = '';
   document.getElementById('binp').value = '';
   window.scrollTo(0,0);
@@ -841,7 +1044,7 @@ function startLoad(txt) {
   document.getElementById('ltxt').textContent = txt;
   document.getElementById('lprov').textContent = 'via ' + providerLabel();
   document.getElementById('loader').classList.add('on');
-  ['rcS','rcB','rcRef','errc','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  ['rcS','rcB','rcDHU','rcRef','errc','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
   var dotClass = provider === 'claude' ? 'dot da' : (mode === 'b' ? 'dot dp' : 'dot dg');
   var dots = document.getElementById('ldots').children;
   for (var i = 0; i < dots.length; i++) dots[i].className = dotClass;
@@ -891,6 +1094,7 @@ async function doSupplement() {
 
     var t = await llmPromise;
     renderS(v, t);
+    if (isHomeopathic(v)) document.getElementById('rcDHU').classList.add('on');
 
     // Show reference values if nutrient was identified
     if (nutKey) {
