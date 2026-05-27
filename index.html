@@ -837,7 +837,7 @@ function doVitDRechner() {
   document.getElementById('vitdStatusVal').className = 'vitd-row-val ' + statusColor;
   document.getElementById('vitdAufbau').textContent = aufbau.toLocaleString('de-DE') + ' IE/Tag';
   document.getElementById('vitdDauer').textContent = days + ' Tage (Ziel: ' + tgtLabel + ')';
-  document.getElementById('vitdGesamt').textContent = Math.round(totalIU / 1000) + '.000 IE gesamt';
+  document.getElementById('vitdGesamt').textContent = Math.round(totalIU).toLocaleString('de-DE') + ' IE gesamt';
   document.getElementById('vitdErhalt').textContent = erhalt.toLocaleString('de-DE') + ' IE/Tag';
 
   var hint = cur < 30 ? 'Bei starkem Mangel bitte Blutbild nach 8–12 Wochen kontrollieren. ' : '';
