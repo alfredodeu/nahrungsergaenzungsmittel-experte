@@ -369,6 +369,10 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
       <button class="vitd-unit-btn active" id="vitdUnitNg" onclick="vitdSetUnit('ng')">ng/ml</button>
       <button class="vitd-unit-btn" id="vitdUnitNmol" onclick="vitdSetUnit('nmol')">nmol/L</button>
     </div>
+    <div class="vitd-unit-toggle" style="margin-top:6px">
+      <button class="vitd-unit-btn active" id="vitdModeCons" onclick="vitdSetMode('conservative')">Konservativ (EFSA)</button>
+      <button class="vitd-unit-btn" id="vitdModeAggr" onclick="vitdSetMode('aggressive')">Aufdosierung (Coimbra)</button>
+    </div>
     <div class="rcalc-form">
       <div class="rcalc-field">
         <label>Aktueller Wert</label>
@@ -393,6 +397,13 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
           <option value="60">60 Tage</option>
           <option value="90" selected>90 Tage</option>
           <option value="180">180 Tage</option>
+        </select>
+      </div>
+      <div class="rcalc-field" id="vitdLossField" style="display:none">
+        <label>T&auml;gl. Verlust</label>
+        <select id="vitdLoss">
+          <option value="0.83" selected>0,83 % (normal)</option>
+          <option value="1.5">1,5 % (Raucher / krank)</option>
         </select>
       </div>
     </div>
@@ -776,6 +787,17 @@ function doRechner() {
 // ── Vitamin D Rechner ─────────────────────────────────────────────────────────
 
 var vitdUnit = 'ng';
+var vitdMode = 'conservative';
+
+function vitdSetMode(m) {
+  vitdMode = m;
+  document.getElementById('vitdModeCons').classList.toggle('active', m === 'conservative');
+  document.getElementById('vitdModeAggr').classList.toggle('active', m === 'aggressive');
+  document.getElementById('vitdLossField').style.display = m === 'aggressive' ? '' : 'none';
+  if (document.getElementById('vitdResult').style.display === 'block') {
+    doVitDRechner();
+  }
+}
 
 
 function vitdSetUnit(u) {
@@ -807,18 +829,35 @@ function doVitDRechner() {
 
   if (tgt <= cur) { alert('Zielwert muss größer als aktueller Wert sein.'); return; }
 
-  // Aufbaudosis: (Ziel - Aktuell) × Gewicht × 40 / Tage  (Heaney/Vieth-Formel)
-  var totalIU  = (tgt - cur) * weight * 40;
-  var aufbauRaw = totalIU / days;
-  // Round to nearest 500 IU
-  var aufbau = Math.round(aufbauRaw / 500) * 500;
-  aufbau = Math.max(500, aufbau);
+  var totalIU, aufbau, erhalt, formulaText;
 
-  // Erhaltungsdosis: gewichtsbasiert, altersangepasst, blutwertkorrigiert
-  var erhaltFactor = age >= 65 ? 60 : 40;
-  var erhaltAdjust = cur < 20 ? 500 : cur > 50 ? -500 : 0;
-  var erhalt = Math.round((weight * erhaltFactor + erhaltAdjust) / 500) * 500;
-  erhalt = Math.max(1000, Math.min(4000, erhalt));
+  if (vitdMode === 'aggressive') {
+    // Aufdosierung (vitamin-d3-rechner.de / Coimbra-nahe Schule)
+    // Faktor 140 IE pro kg pro 1 ng/ml; Erhaltung: kg × Ziel × 1,35 × Verlust%
+    var loss = parseFloat(document.getElementById('vitdLoss').value) || 0.83;
+    totalIU = (tgt - cur) * weight * 140;
+    var erhaltRaw = weight * tgt * 1.35 * loss;
+    // Tagesdosis Auffüllphase = ((Aufholbedarf/Tage) + Erhaltung) × 0,93
+    var aufbauRaw = ((totalIU / days) + erhaltRaw) * 0.93;
+    aufbau = Math.round(aufbauRaw / 100) * 100;
+    erhalt = Math.round(erhaltRaw / 100) * 100;
+    formulaText = 'Aufdosierung: (Ziel−Ist)×kg×140 gesamt, Tagesdosis = ((Aufholbedarf/Tage)+Erhaltung)×0,93. ' +
+                  'Erhaltung = kg×Ziel×1,35×Verlust% (' + loss.toString().replace('.', ',') + ' %). ' +
+                  '⚠️ Liegt deutlich über der EFSA-Obergrenze (4.000 IE/Tag) – nur unter ärztlicher Begleitung.';
+  } else {
+    // Konservativ (DGE/EFSA, Heaney/Vieth-Formel) – unverändert
+    totalIU  = (tgt - cur) * weight * 40;
+    var aufbauRawC = totalIU / days;
+    aufbau = Math.round(aufbauRawC / 500) * 500;
+    aufbau = Math.max(500, aufbau);
+    var erhaltFactor = age >= 65 ? 60 : 40;
+    var erhaltAdjust = cur < 20 ? 500 : cur > 50 ? -500 : 0;
+    erhalt = Math.round((weight * erhaltFactor + erhaltAdjust) / 500) * 500;
+    erhalt = Math.max(1000, Math.min(4000, erhalt));
+    formulaText = 'Formel: (Zielwert − Istwert) × Körpergewicht × 40 ÷ Tage. Erhaltungsdosis: ' + erhaltFactor + ' IE/kg' +
+                  (erhaltAdjust !== 0 ? (erhaltAdjust > 0 ? ' +500 IE (niedriger Ausgangswert)' : ' −500 IE (optimaler Ausgangswert)') : '') +
+                  '. Obere sichere Grenze: 4.000 IE/Tag (EFSA).';
+  }
 
   // Status
   var statusText, statusClass, statusColor;
@@ -843,10 +882,7 @@ function doVitDRechner() {
   var hint = cur < 30 ? 'Bei starkem Mangel bitte Blutbild nach 8–12 Wochen kontrollieren. ' : '';
   var seniorHint = age >= 65 ? 'Ab 65 Jahren ist die Hautsynthese deutlich reduziert – regelmäßige Kontrolle empfohlen. ' : '';
   document.getElementById('vitdDisclaimer').textContent =
-    hint + seniorHint +
-    'Formel: (Zielwert − Istwert) × Körpergewicht × 40 ÷ Tage. Erhaltungsdosis: ' + erhaltFactor + ' IE/kg' +
-    (erhaltAdjust !== 0 ? (erhaltAdjust > 0 ? ' +500 IE (niedriger Ausgangswert)' : ' −500 IE (optimaler Ausgangswert)') : '') +
-    '. Kein Ersatz für ärztliche Beratung. Obere sichere Grenze: 4.000 IE/Tag (EFSA).';
+    hint + seniorHint + formulaText + ' Kein Ersatz für ärztliche Beratung.';
 
   document.getElementById('vitdResult').style.display = 'block';
   setTimeout(function(){ document.getElementById('vitdResult').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
