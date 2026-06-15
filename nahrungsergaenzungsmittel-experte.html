@@ -118,9 +118,10 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .rhead { padding:13px 16px; border-bottom:0.5px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .rhead.g { background:var(--gbg); } .rhead.p { background:var(--pbg); }
 .rname { font-size:17px; font-weight:700; letter-spacing:-0.2px; }
-.rname.g { color:var(--gtxt); } .rname.p { color:var(--ptxt); }
+.rname.g { color:var(--gtxt); } .rname.p { color:var(--ptxt); } .rname.t { color:var(--tealtxt); }
+.rhead.t { background:var(--tealbg); }
 .rbadge { font-size:10px; font-weight:600; padding:3px 8px; border-radius:20px; color:#fff; white-space:nowrap; flex-shrink:0; display:flex; align-items:center; gap:4px; }
-.rbg { background:var(--green); } .rbp { background:var(--purple); }
+.rbg { background:var(--green); } .rbp { background:var(--purple); } .rbt { background:var(--teal); }
 .rprovider { font-size:10px; opacity:0.8; }
 
 .rbody { padding:14px 16px; }
@@ -710,7 +711,7 @@ function setMode(m) {
 }
 
 function reset() {
-  ['rcS','rcB','rcRef','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  ['rcS','rcB','rcDHU','rcRef','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
   document.getElementById('sinp').value = '';
   document.getElementById('binp').value = '';
   window.scrollTo(0,0);
@@ -793,6 +794,7 @@ function parseSec(text, map) {
 
 function fmt(t) {
   return t
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
     .replace(/^[*-]\s+(.+)$/gm,'<li>$1</li>')
     .replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>')

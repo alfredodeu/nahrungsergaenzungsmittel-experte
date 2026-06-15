@@ -102,7 +102,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .loading.on { display:block; }
 .dots { display:flex; gap:7px; justify-content:center; margin-bottom:12px; }
 .dot { width:9px; height:9px; border-radius:50%; animation:bounce 1.3s ease-in-out infinite; }
-.dg { background:var(--green); } .dp { background:var(--purple); } .da { background:var(--amber); }
+.dg { background:var(--green); } .dp { background:var(--purple); } .da { background:var(--amber); } .dt { background:var(--teal); }
 .dot:nth-child(2){animation-delay:0.18s} .dot:nth-child(3){animation-delay:0.36s}
 @keyframes bounce{0%,80%,100%{opacity:0.2;transform:scale(0.7)}40%{opacity:1;transform:scale(1)}}
 .llabel { font-size:14px; color:var(--text2); }
@@ -215,6 +215,31 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .vitd-row-val.orange { color:#d97706; }
 .vitd-row-val.red { color:#dc2626; }
 .vitd-disclaimer { font-size:10px; color:var(--text3); padding:8px 14px 10px; border-top:0.5px solid var(--border); line-height:1.6; }
+
+/* ── Interaktions-Checker ────────────────────────────────────────────────── */
+.tbtn.ai { background:var(--tealbg); color:var(--tealtxt); border:0.5px solid rgba(13,148,136,0.25); }
+
+/* ── Vergleichsmodus ─────────────────────────────────────────────────────── */
+.cmp-row { display:flex; gap:8px; margin-bottom:10px; }
+.cmp-row input { flex:1; height:42px; border-radius:var(--rmd); border:0.5px solid var(--border-med); padding:0 12px; font-size:14px; font-family:inherit; background:var(--bg); color:var(--text); outline:none; -webkit-appearance:none; }
+.cmp-row input:focus { border-color:var(--teal); box-shadow:0 0 0 2px var(--teallight); }
+.cmp-vs { font-size:12px; font-weight:700; color:var(--text3); display:flex; align-items:center; }
+.cmp-result { display:none; margin-top:12px; }
+.cmp-result.on { display:block; }
+.cmp-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+.cmp-col { background:var(--bg); border:0.5px solid var(--border); border-radius:var(--rlg); padding:10px 12px; }
+.cmp-col-head { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--tealtxt); margin-bottom:6px; }
+.cmp-col ul { padding-left:1.2rem; margin-top:4px; }
+.cmp-col li { margin-bottom:3px; font-size:13px; line-height:1.6; }
+
+/* ── Blutwerte Panel ─────────────────────────────────────────────────────── */
+.blut-result { display:none; border-radius:var(--rxl); overflow:hidden; margin-top:14px; border:0.5px solid var(--border); }
+.blut-result.on { display:block; }
+.blut-head { padding:11px 14px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; background:var(--tealbg); color:var(--tealtxt); }
+.blut-body { padding:10px 14px; font-size:14px; line-height:1.7; }
+.blut-body ul { padding-left:1.2rem; margin-top:4px; }
+.blut-body li { margin-bottom:3px; }
+.blut-disclaimer { font-size:10px; color:var(--text3); padding:8px 14px 10px; border-top:0.5px solid var(--border); line-height:1.6; }
 </style>
 </head>
 <body>
@@ -239,6 +264,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
   <button class="tbtn ag" id="btnS" onclick="setMode('s')">&#x1F48A; Mittel-Info</button>
   <button class="tbtn" id="btnB" onclick="setMode('b')">&#x1F50D; Beschwerden</button>
   <button class="tbtn" id="btnR" onclick="setMode('r')">&#x1F4CA; Rechner</button>
+  <button class="tbtn" id="btnI" onclick="setMode('i')">&#x26A1; Prüfen</button>
 </div>
 
 <!-- Supplement Panel -->
@@ -283,6 +309,16 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
       <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 11 Silicea D12')">Nr. 11 Silicea</button>
       <button class="chip cg" onclick="qs('Sch&uuml;&szlig;lersalz Nr. 12 Calcium sulfuricum D6')">Nr. 12 Calc. sulf.</button>
     </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="slabel">&#x2694;&#xFE0F; Vergleichsmodus</div>
+    <div class="cmp-row">
+      <input type="text" id="cmpA" placeholder="z.B. Magnesiumglycinat" autocomplete="off"/>
+      <span class="cmp-vs">vs</span>
+      <input type="text" id="cmpB" placeholder="z.B. Magnesiumcitrat" autocomplete="off"/>
+    </div>
+    <button class="btn bi" style="background:var(--teal)" onclick="doCompare()">Vergleichen</button>
+    <div class="cmp-result" id="cmpResult"></div>
   </div>
 </div>
 
@@ -437,6 +473,61 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
       </div>
     </div>
   </div>
+
+  <!-- Blutwerte Panel -->
+  <div class="card" style="margin-top:12px">
+    <div class="slabel">&#x1F9EC; Blutwerte &ndash; Supplementempfehlung</div>
+    <div class="rcalc-form">
+      <div class="rcalc-field">
+        <label>Ferritin (pg/ml)</label>
+        <input type="number" id="blFerritin" min="0" max="1000" placeholder="z.B. 30"/>
+      </div>
+      <div class="rcalc-field">
+        <label>Vitamin B12 (pg/ml)</label>
+        <input type="number" id="blB12" min="0" max="5000" placeholder="z.B. 280"/>
+      </div>
+      <div class="rcalc-field">
+        <label>Eisen (µg/dl)</label>
+        <input type="number" id="blEisen" min="0" max="500" placeholder="z.B. 70"/>
+      </div>
+      <div class="rcalc-field">
+        <label>TSH (mIU/L)</label>
+        <input type="number" id="blTSH" min="0" max="50" step="0.1" placeholder="z.B. 2.5"/>
+      </div>
+    </div>
+    <button class="btn bi" style="background:var(--teal)" onclick="doBlood()">Auswerten</button>
+    <div class="blut-result" id="blResult">
+      <div class="blut-head" id="blHead">Blutwerte &ndash; Analyse</div>
+      <div class="blut-body" id="blBody"></div>
+      <div class="blut-disclaimer">Referenzwerte: DGE/EFSA 2021, NIH DRI 2020. Laborwerte interpretieren sich nur im Gesamtkontext. Kein Ersatz für ärztliche Beratung.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Interaktions-Checker Panel -->
+<div id="panelI" class="hidden">
+  <div class="card">
+    <div class="slabel" style="margin-bottom:6px">Wechselwirkungen prüfen</div>
+    <div class="cmp-row">
+      <input type="text" id="intA" placeholder="z.B. Eisen" autocomplete="off"/>
+      <span class="cmp-vs">+</span>
+      <input type="text" id="intB" placeholder="z.B. Vitamin C" autocomplete="off"/>
+    </div>
+    <button class="btn bw" style="background:var(--teal)" onclick="doInteraction()">Prüfen</button>
+  </div>
+  <div class="card" style="padding-top:12px">
+    <div class="slabel">Häufige Kombinationen</div>
+    <div class="chips">
+      <button class="chip" onclick="qi('Eisen','Vitamin C')">Eisen + Vit C</button>
+      <button class="chip" onclick="qi('Magnesium','Vitamin D3')">Mg + Vit D</button>
+      <button class="chip" onclick="qi('Zink','Kupfer')">Zink + Kupfer</button>
+      <button class="chip" onclick="qi('Omega-3','Vitamin E')">Omega-3 + Vit E</button>
+      <button class="chip" onclick="qi('Kalzium','Eisen')">Kalzium + Eisen</button>
+      <button class="chip" onclick="qi('Vitamin D3','Kalzium')">Vit D + Kalzium</button>
+      <button class="chip" onclick="qi('B12','Folsäure')">B12 + Folsäure</button>
+      <button class="chip" onclick="qi('Ashwagandha','Melatonin')">Ashwa + Melatonin</button>
+    </div>
+  </div>
 </div>
 
 <div class="loading" id="loader">
@@ -463,6 +554,14 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
     <div class="rbadge rbp">Empfehlungen <span class="rprovider" id="rpB"></span></div>
   </div>
   <div class="rbody" id="rbB"></div>
+</div>
+
+<div class="rcard" id="rcI">
+  <div class="rhead" style="background:var(--tealbg)">
+    <div class="rname t" id="rnI"></div>
+    <div class="rbadge rbt">Interaktion <span class="rprovider" id="rpI"></span></div>
+  </div>
+  <div class="rbody" id="rbI"></div>
 </div>
 
 <div class="rcard" id="rcDHU">
@@ -894,8 +993,17 @@ var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungs
 
 var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde, Homoeopathie und Schuessler-Salze.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme. Hinweis: DHU (dhu.de) ist der fuehrende deutsche Hersteller.]\n\n###SCH###\n[2-3 passende Schuessler-Salze. Fuer jedes: **Nr. X Name (Potenz)** - Biochemisches Wirkprinzip und warum es bei diesen Beschwerden hilft. Orientiere dich an der Qualitaet von NetDoctor.de als Referenz. Hinweis: DHU (dhu.de) ist der fuehrende Hersteller in Deutschland.]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
 
+var SYS_I = 'Du bist ein Experte fuer Wechselwirkungen zwischen Nahrungsergaenzungsmitteln, Medikamenten und Supplementen.\n\nDer Nutzer nennt zwei Mittel. Pruefe auf:\n- Bekannte Interaktionen (hemmend, foerdernd, antagonistisch)\n- Sicherheitsrisiken\n- Optimale Einnahmeabstaende\n- Synergien (wenn positiv)\n\nGib strukturierte Infos mit exakt diesen Trennzeichen:\n\n###VE###\n[Vertraeglichkeit: gut/bedingt/vermeiden – kurze Begruendung]\n\n###IN###\n[Bekannte Interaktionen: Was passiert im Koerper, Mechanismus kurz erklaert]\n\n###EM###\n[Empfehlung: Einnahmeabstand, bessere Kombination, Alternativen]\n\nAuf Deutsch, klar und praxisnah.Keine Angst schueren, aber ehrlich sein.';
+
+var SYS_BL = 'Du bist ein Experte fuerLaborwerte und Nahrungsergaenzungsmittel.\n\nDer Nutzer gibt Blutwerte an. Analysiere:\n- Liegen die Werte im Referenzbereich?\n- Gibt es Mangel oder Ueberschuss?\n- Welche Supplements koennten helfen?\n\nGib strukturierte Infos mit exakt diesen Trennzeichen:\n\n###AN###\n[Analyse: Wert – Referenzbereich – Bewertung (ok/low/high)]\n\n###SU###\n[Supplement-Empfehlung: **Name** – Warum, Dosierung, Einnahmehinweis]\n\n###HI###\n[Hubweis: Wann zum Arzt, Kontrollintervall]\n\nAuf Deutsch, verstaendlich. Basiswerte: Ferritin (30-300 pg/ml), B12 (200-900 pg/ml), Eisen (60-170 µg/dl), TSH (0.4-4.0 mIU/L).';
+
+var SYS_CMP = 'Du bist ein Experte fuer Nahrungsergaenzungsmittel.\n\nDer Nutzer vergleicht zwei Supplemente. Gib einen strukturierten Vergleich:\n\n###UG###\n[Uebersicht: Kurze Gegenueberstellung der beiden Mittel]\n\n###WU###\n[Wirkung: Biochemische Wirkungsweise, Aufnahme im Koerper]\n\n###DO###\n[Dosierung: Typische Dosierungsbereiche, Formen]\n\n###PR###\n[Preis/Verfuegbarkeit: Typischer Preis, Bezugsquellen]\n\n###FA###\n[Fazit: Wann ist welches Mittel besser geeignet?]\n\nAuf Deutsch, neutral und faktenbasiert.';
+
 var SS = {'EG':'Einsatzgebiet','AW':'Spezieller Anwendungsbereich','EI':'Einnahmeempfehlungen','DO':'Dosierungshinweise','DA':'Dauereinnahme','KQ':'Kaufquellen','KO':'Kombinationen'};
 var SB = {'UR':'Mögl. Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Homöopathische Mittel','SCH':'Schüßlersalze','LS':'Lebensstil-Tipps','HI':'Wichtiger Hinweis'};
+var SI = {'VE':'Verträglichkeit','IN':'Interaktion','EM':'Empfehlung'};
+var SBL = {'AN':'Analyse','SU':'Supplement-Empfehlung','HI':'Hinweis'};
+var SCMP = {'UG':'Übersicht','WU':'Wirkung','DO':'Dosierung','PR':'Preis/Verfügbarkeit','FA':'Fazit'};
 
 // ── Key Storage ───────────────────────────────────────────────────────────────
 
@@ -922,16 +1030,25 @@ function setMode(m) {
   document.getElementById('panelS').classList.toggle('hidden', m !== 's');
   document.getElementById('panelB').classList.toggle('hidden', m !== 'b');
   document.getElementById('panelR').classList.toggle('hidden', m !== 'r');
+  document.getElementById('panelI').classList.toggle('hidden', m !== 'i');
   document.getElementById('btnS').className = m === 's' ? 'tbtn ag' : 'tbtn';
   document.getElementById('btnB').className = m === 'b' ? 'tbtn ap' : 'tbtn';
   document.getElementById('btnR').className = m === 'r' ? 'tbtn ar' : 'tbtn';
+  document.getElementById('btnI').className = m === 'i' ? 'tbtn ai' : 'tbtn';
   reset();
 }
 
 function reset() {
-  ['rcS','rcB','rcDHU','rcRef','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  ['rcS','rcB','rcI','rcDHU','rcRef','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
   document.getElementById('sinp').value = '';
   document.getElementById('binp').value = '';
+  document.getElementById('cmpResult').classList.remove('on');
+  document.getElementById('cmpResult').innerHTML = '';
+  document.getElementById('blResult').classList.remove('on');
+  document.getElementById('intA').value = '';
+  document.getElementById('intB').value = '';
+  document.getElementById('cmpA').value = '';
+  document.getElementById('cmpB').value = '';
   window.scrollTo(0,0);
 }
 
@@ -1014,6 +1131,7 @@ function parseSec(text, map) {
 
 function fmt(t) {
   return t
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
     .replace(/^[*-]\s+(.+)$/gm,'<li>$1</li>')
     .replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>')
@@ -1060,8 +1178,8 @@ function startLoad(txt) {
   document.getElementById('ltxt').textContent = txt;
   document.getElementById('lprov').textContent = 'via ' + providerLabel();
   document.getElementById('loader').classList.add('on');
-  ['rcS','rcB','rcDHU','rcRef','errc','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
-  var dotClass = provider === 'claude' ? 'dot da' : (mode === 'b' ? 'dot dp' : 'dot dg');
+  ['rcS','rcB','rcI','rcDHU','rcRef','errc','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  var dotClass = provider === 'claude' ? 'dot da' : (mode === 'b' ? 'dot dp' : mode === 'i' ? 'dot dt' : 'dot dg');
   var dots = document.getElementById('ldots').children;
   for (var i = 0; i < dots.length; i++) dots[i].className = dotClass;
 }
@@ -1137,6 +1255,104 @@ async function doSymptom() {
     setTimeout(function(){ document.getElementById('rcB').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
   } catch(e) { handleError(e); }
   finally { stopLoad(); document.getElementById('bbtn').disabled = false; }
+}
+
+// ── Interaktions-Checker ──────────────────────────────────────────────────
+
+function qi(a, b) {
+  setMode('i');
+  document.getElementById('intA').value = a;
+  document.getElementById('intB').value = b;
+  doInteraction();
+}
+
+async function doInteraction() {
+  var a = document.getElementById('intA').value.trim();
+  var b = document.getElementById('intB').value.trim();
+  if (!a || !b) { document.getElementById(a ? 'intB' : 'intA').focus(); return; }
+  startLoad('Prüfe Interaktion: ' + a + ' + ' + b + '...');
+  try {
+    var t = await callAPI(SYS_I, 'Mittel 1: ' + a + '\nMittel 2: ' + b);
+    renderI(a, b, t);
+    document.getElementById('btnnew').classList.add('on');
+    setTimeout(function(){ document.getElementById('rcI').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
+  } catch(e) { handleError(e); }
+  finally { stopLoad(); }
+}
+
+function renderI(a, b, text) {
+  var secs = parseSec(text, SI), h = '';
+  for (var i = 0; i < secs.length; i++) {
+    if (i > 0) h += '<div class="div"></div>';
+    h += '<div class="rsec"><div class="rstitle">'+secs[i].t+'</div><div class="rscontent">'+fmt(secs[i].c)+'</div></div>';
+  }
+  document.getElementById('rnI').textContent = a + ' + ' + b;
+  document.getElementById('rpI').textContent = '· ' + providerLabel();
+  document.getElementById('rbI').innerHTML = h || '<div class="rscontent">'+fmt(text)+'</div>';
+  document.getElementById('rcI').classList.add('on');
+}
+
+// ── Blutwerte Analyse ────────────────────────────────────────────────────
+
+async function doBlood() {
+  var ferritin = document.getElementById('blFerritin').value.trim();
+  var b12 = document.getElementById('blB12').value.trim();
+  var eisen = document.getElementById('blEisen').value.trim();
+  var tsh = document.getElementById('blTSH').value.trim();
+  if (!ferritin && !b12 && !eisen && !tsh) {
+    showErr('Bitte mindestens einen Blutwert eingeben.', 'warn');
+    return;
+  }
+  var vals = [];
+  if (ferritin) vals.push('Ferritin: ' + ferritin + ' pg/ml');
+  if (b12) vals.push('Vitamin B12: ' + b12 + ' pg/ml');
+  if (eisen) vals.push('Eisen: ' + eisen + ' µg/dl');
+  if (tsh) vals.push('TSH: ' + tsh + ' mIU/L');
+  startLoad('Analysiere Blutwerte...');
+  try {
+    var t = await callAPI(SYS_BL, 'Blutwerte:\n' + vals.join('\n'));
+    renderBL(t);
+    document.getElementById('btnnew').classList.add('on');
+    setTimeout(function(){ document.getElementById('blResult').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
+  } catch(e) { handleError(e); }
+  finally { stopLoad(); }
+}
+
+function renderBL(text) {
+  var secs = parseSec(text, SBL), h = '';
+  for (var i = 0; i < secs.length; i++) {
+    if (i > 0) h += '<div class="div"></div>';
+    h += '<div class="rsec"><div class="rstitle">'+secs[i].t+'</div><div class="rscontent">'+fmt(secs[i].c)+'</div></div>';
+  }
+  document.getElementById('blBody').innerHTML = h || '<div class="rscontent">'+fmt(text)+'</div>';
+  document.getElementById('blResult').classList.add('on');
+}
+
+// ── Vergleichsmodus ───────────────────────────────────────────────────────
+
+async function doCompare() {
+  var a = document.getElementById('cmpA').value.trim();
+  var b = document.getElementById('cmpB').value.trim();
+  if (!a || !b) { document.getElementById(a ? 'cmpB' : 'cmpA').focus(); return; }
+  startLoad('Vergleiche: ' + a + ' vs ' + b + '...');
+  try {
+    var t = await callAPI(SYS_CMP, 'Vergleich: ' + a + ' vs ' + b);
+    renderCMP(a, b, t);
+    document.getElementById('btnnew').classList.add('on');
+    setTimeout(function(){ document.getElementById('cmpResult').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
+  } catch(e) { handleError(e); }
+  finally { stopLoad(); }
+}
+
+function renderCMP(a, b, text) {
+  var secs = parseSec(text, SCMP), h = '';
+  for (var i = 0; i < secs.length; i++) {
+    if (i > 0) h += '<div class="div"></div>';
+    h += '<div class="rsec"><div class="rstitle">'+secs[i].t+'</div><div class="rscontent">'+fmt(secs[i].c)+'</div></div>';
+  }
+  var el = document.getElementById('cmpResult');
+  el.innerHTML = '<div class="rcard on"><div class="rhead" style="background:var(--tealbg)"><div class="rname t">'+a+' vs '+b+'</div><div class="rbadge rbt">Vergleich</div></div><div class="rbody">'+(h || fmt(text))+'</div></div>';
+  el.classList.add('on');
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
