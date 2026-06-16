@@ -226,11 +226,6 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .cmp-vs { font-size:12px; font-weight:700; color:var(--text3); display:flex; align-items:center; }
 .cmp-result { display:none; margin-top:12px; }
 .cmp-result.on { display:block; }
-.cmp-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
-.cmp-col { background:var(--bg); border:0.5px solid var(--border); border-radius:var(--rlg); padding:10px 12px; }
-.cmp-col-head { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--tealtxt); margin-bottom:6px; }
-.cmp-col ul { padding-left:1.2rem; margin-top:4px; }
-.cmp-col li { margin-bottom:3px; font-size:13px; line-height:1.6; }
 
 /* ── Blutwerte Panel ─────────────────────────────────────────────────────── */
 .blut-result { display:none; border-radius:var(--rxl); overflow:hidden; margin-top:14px; border:0.5px solid var(--border); }
@@ -479,7 +474,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
     <div class="slabel">&#x1F9EC; Blutwerte &ndash; Supplementempfehlung</div>
     <div class="rcalc-form">
       <div class="rcalc-field">
-        <label>Ferritin (pg/ml)</label>
+        <label>Ferritin (ng/ml)</label>
         <input type="number" id="blFerritin" min="0" max="1000" placeholder="z.B. 30"/>
       </div>
       <div class="rcalc-field">
@@ -993,9 +988,9 @@ var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungs
 
 var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde, Homoeopathie und Schuessler-Salze.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme. Hinweis: DHU (dhu.de) ist der fuehrende deutsche Hersteller.]\n\n###SCH###\n[2-3 passende Schuessler-Salze. Fuer jedes: **Nr. X Name (Potenz)** - Biochemisches Wirkprinzip und warum es bei diesen Beschwerden hilft. Orientiere dich an der Qualitaet von NetDoctor.de als Referenz. Hinweis: DHU (dhu.de) ist der fuehrende Hersteller in Deutschland.]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
 
-var SYS_I = 'Du bist ein Experte fuer Wechselwirkungen zwischen Nahrungsergaenzungsmitteln, Medikamenten und Supplementen.\n\nDer Nutzer nennt zwei Mittel. Pruefe auf:\n- Bekannte Interaktionen (hemmend, foerdernd, antagonistisch)\n- Sicherheitsrisiken\n- Optimale Einnahmeabstaende\n- Synergien (wenn positiv)\n\nGib strukturierte Infos mit exakt diesen Trennzeichen:\n\n###VE###\n[Vertraeglichkeit: gut/bedingt/vermeiden – kurze Begruendung]\n\n###IN###\n[Bekannte Interaktionen: Was passiert im Koerper, Mechanismus kurz erklaert]\n\n###EM###\n[Empfehlung: Einnahmeabstand, bessere Kombination, Alternativen]\n\nAuf Deutsch, klar und praxisnah.Keine Angst schueren, aber ehrlich sein.';
+var SYS_I = 'Du bist ein Experte fuer Wechselwirkungen zwischen Nahrungsergaenzungsmitteln, Medikamenten und Supplementen.\n\nDer Nutzer nennt zwei Mittel. Pruefe auf:\n- Bekannte Interaktionen (hemmend, foerdernd, antagonistisch)\n- Sicherheitsrisiken\n- Optimale Einnahmeabstaende\n- Synergien (wenn positiv)\n\nGib strukturierte Infos mit exakt diesen Trennzeichen:\n\n###VE###\n[Vertraeglichkeit: gut/bedingt/vermeiden – kurze Begruendung]\n\n###IN###\n[Bekannte Interaktionen: Was passiert im Koerper, Mechanismus kurz erklaert]\n\n###EM###\n[Empfehlung: Einnahmeabstand, bessere Kombination, Alternativen]\n\nAuf Deutsch, klar und praxisnah. Keine Angst schueren, aber ehrlich sein.';
 
-var SYS_BL = 'Du bist ein Experte fuerLaborwerte und Nahrungsergaenzungsmittel.\n\nDer Nutzer gibt Blutwerte an. Analysiere:\n- Liegen die Werte im Referenzbereich?\n- Gibt es Mangel oder Ueberschuss?\n- Welche Supplements koennten helfen?\n\nGib strukturierte Infos mit exakt diesen Trennzeichen:\n\n###AN###\n[Analyse: Wert – Referenzbereich – Bewertung (ok/low/high)]\n\n###SU###\n[Supplement-Empfehlung: **Name** – Warum, Dosierung, Einnahmehinweis]\n\n###HI###\n[Hubweis: Wann zum Arzt, Kontrollintervall]\n\nAuf Deutsch, verstaendlich. Basiswerte: Ferritin (30-300 pg/ml), B12 (200-900 pg/ml), Eisen (60-170 µg/dl), TSH (0.4-4.0 mIU/L).';
+var SYS_BL = 'Du bist ein Experte fuer Laborwerte und Nahrungsergaenzungsmittel.\n\nDer Nutzer gibt Blutwerte an. Analysiere:\n- Liegen die Werte im Referenzbereich?\n- Gibt es Mangel oder Ueberschuss?\n- Welche Supplements koennten helfen?\n\nGib strukturierte Infos mit exakt diesen Trennzeichen:\n\n###AN###\n[Analyse: Wert – Referenzbereich – Bewertung (ok/low/high)]\n\n###SU###\n[Supplement-Empfehlung: **Name** – Warum, Dosierung, Einnahmehinweis]\n\n###HI###\n[Hinweis: Wann zum Arzt, Kontrollintervall]\n\nAuf Deutsch, verstaendlich. Basiswerte: Ferritin (30-300 ng/ml), B12 (200-900 pg/ml), Eisen (60-170 µg/dl), TSH (0.4-4.0 mIU/L).';
 
 var SYS_CMP = 'Du bist ein Experte fuer Nahrungsergaenzungsmittel.\n\nDer Nutzer vergleicht zwei Supplemente. Gib einen strukturierten Vergleich:\n\n###UG###\n[Uebersicht: Kurze Gegenueberstellung der beiden Mittel]\n\n###WU###\n[Wirkung: Biochemische Wirkungsweise, Aufnahme im Koerper]\n\n###DO###\n[Dosierung: Typische Dosierungsbereiche, Formen]\n\n###PR###\n[Preis/Verfuegbarkeit: Typischer Preis, Bezugsquellen]\n\n###FA###\n[Fazit: Wann ist welches Mittel besser geeignet?]\n\nAuf Deutsch, neutral und faktenbasiert.';
 
@@ -1049,6 +1044,11 @@ function reset() {
   document.getElementById('intB').value = '';
   document.getElementById('cmpA').value = '';
   document.getElementById('cmpB').value = '';
+  document.getElementById('blBody').innerHTML = '';
+  document.getElementById('blFerritin').value = '';
+  document.getElementById('blB12').value = '';
+  document.getElementById('blEisen').value = '';
+  document.getElementById('blTSH').value = '';
   window.scrollTo(0,0);
 }
 
@@ -1304,7 +1304,7 @@ async function doBlood() {
     return;
   }
   var vals = [];
-  if (ferritin) vals.push('Ferritin: ' + ferritin + ' pg/ml');
+  if (ferritin) vals.push('Ferritin: ' + ferritin + ' ng/ml');
   if (b12) vals.push('Vitamin B12: ' + b12 + ' pg/ml');
   if (eisen) vals.push('Eisen: ' + eisen + ' µg/dl');
   if (tsh) vals.push('TSH: ' + tsh + ' mIU/L');

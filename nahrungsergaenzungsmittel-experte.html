@@ -711,7 +711,7 @@ function setMode(m) {
 }
 
 function reset() {
-  ['rcS','rcB','rcDHU','rcRef','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  ['rcS','rcB','rcRef','errc','loader','btnnew'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
   document.getElementById('sinp').value = '';
   document.getElementById('binp').value = '';
   window.scrollTo(0,0);
