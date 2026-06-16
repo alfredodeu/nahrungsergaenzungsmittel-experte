@@ -1,2 +1,5 @@
 # Claude Code – lokale, persönliche Einstellungen (nicht teilen)
 .claude/settings.local.json
+
+# Claude Code – ephemere Git-Worktrees (gehören nicht ins Repo)
+.claude/worktrees/
