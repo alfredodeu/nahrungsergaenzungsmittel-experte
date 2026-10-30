@@ -921,6 +921,29 @@ function doVitDRechner() {
   var cur = vitdUnit === 'nmol' ? rawCur / 2.5 : rawCur;
   var tgt = vitdUnit === 'nmol' ? rawTgt / 2.5 : rawTgt;
 
+  var unitLabel = vitdUnit === 'nmol' ? 'nmol/L' : 'ng/ml';
+
+  // Zu hoher Ausgangswert: keine Dosis berechnen, sondern warnen
+  if (cur >= 100) {
+    var tox = cur >= 150;
+    document.getElementById('vitdStatusHead').textContent = 'Aktueller Wert: ' + rawCur + ' ' + unitLabel;
+    document.getElementById('vitdStatusHead').className = 'vitd-result-head danger';
+    document.getElementById('vitdStatusVal').textContent = tox ? '⛔ Toxischer Bereich' : '⛔ Zu hoch';
+    document.getElementById('vitdStatusVal').className = 'vitd-row-val red';
+    document.getElementById('vitdAufbau').textContent = 'keine';
+    document.getElementById('vitdDauer').textContent = '–';
+    document.getElementById('vitdGesamt').textContent = '–';
+    document.getElementById('vitdErhalt').textContent = 'pausieren';
+    document.getElementById('vitdErhalt').className = 'vitd-row-val red';
+    document.getElementById('vitdDisclaimer').textContent =
+      'Werte über 100 ng/ml (250 nmol/L) gelten als zu hoch' + (tox ? ', ab 150 ng/ml (375 nmol/L) drohen Vergiftungserscheinungen (Hyperkalzämie: Übelkeit, Durst, Herzrhythmusstörungen, Nierenschäden)' : '') +
+      '. Vitamin-D-Präparate absetzen und zeitnah ärztlich abklären lassen (inkl. Calcium im Blut). Kein Ersatz für ärztliche Beratung.';
+    document.getElementById('vitdResult').style.display = 'block';
+    setTimeout(function(){ document.getElementById('vitdResult').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
+    return;
+  }
+
+  if (tgt > 100) { alert('Zielwerte über 100 ng/ml (250 nmol/L) werden nicht empfohlen.'); return; }
   if (tgt <= cur) { alert('Zielwert muss größer als aktueller Wert sein.'); return; }
 
   var totalIU, aufbau, erhalt, formulaText;
@@ -939,8 +962,8 @@ function doVitDRechner() {
                   'Erhaltung = kg×Ziel×1,35×Verlust% (' + loss.toString().replace('.', ',') + ' %). ' +
                   '⚠️ Liegt deutlich über der EFSA-Obergrenze (4.000 IE/Tag) – nur unter ärztlicher Begleitung.';
   } else {
-    // Konservativ (DGE/EFSA, Heaney/Vieth-Formel) – unverändert
-    totalIU  = (tgt - cur) * weight * 40;
+    // Konservativ (van Groningen 2010): 40 IE × kg × Δ nmol/L = 100 IE × kg × Δ ng/ml
+    totalIU  = (tgt - cur) * weight * 100;
     var aufbauRawC = totalIU / days;
     aufbau = Math.round(aufbauRawC / 500) * 500;
     aufbau = Math.max(500, aufbau);
@@ -948,9 +971,10 @@ function doVitDRechner() {
     var erhaltAdjust = cur < 20 ? 500 : cur > 50 ? -500 : 0;
     erhalt = Math.round((weight * erhaltFactor + erhaltAdjust) / 500) * 500;
     erhalt = Math.max(1000, Math.min(4000, erhalt));
-    formulaText = 'Formel: (Zielwert − Istwert) × Körpergewicht × 40 ÷ Tage. Erhaltungsdosis: ' + erhaltFactor + ' IE/kg' +
+    formulaText = 'Formel (van Groningen): (Zielwert − Istwert in ng/ml) × Körpergewicht × 100 ÷ Tage (entspricht 40 IE pro kg und nmol/L). Erhaltungsdosis: ' + erhaltFactor + ' IE/kg' +
                   (erhaltAdjust !== 0 ? (erhaltAdjust > 0 ? ' +500 IE (niedriger Ausgangswert)' : ' −500 IE (optimaler Ausgangswert)') : '') +
-                  '. Obere sichere Grenze: 4.000 IE/Tag (EFSA).';
+                  '. Obere sichere Grenze: 4.000 IE/Tag (EFSA).' +
+                  (aufbau > 4000 ? ' ⚠️ Die Aufbaudosis liegt über 4.000 IE/Tag – längere Aufbauphase wählen oder nur unter ärztlicher Begleitung.' : '');
   }
 
   // Status
@@ -961,7 +985,6 @@ function doVitDRechner() {
   else if (cur < 50)  { statusText = '✓ Ausreichend';       statusClass = 'ok';      statusColor = ''; }
   else                { statusText = '✅ Optimal';           statusClass = 'optimal'; statusColor = 'green'; }
 
-  var unitLabel = vitdUnit === 'nmol' ? 'nmol/L' : 'ng/ml';
   var tgtLabel  = vitdUnit === 'nmol' ? Math.round(tgt * 2.5) + ' nmol/L' : tgt + ' ng/ml';
 
   document.getElementById('vitdStatusHead').textContent = 'Aktueller Wert: ' + rawCur + ' ' + unitLabel;
@@ -972,6 +995,7 @@ function doVitDRechner() {
   document.getElementById('vitdDauer').textContent = days + ' Tage (Ziel: ' + tgtLabel + ')';
   document.getElementById('vitdGesamt').textContent = Math.round(totalIU).toLocaleString('de-DE') + ' IE gesamt';
   document.getElementById('vitdErhalt').textContent = erhalt.toLocaleString('de-DE') + ' IE/Tag';
+  document.getElementById('vitdErhalt').className = 'vitd-row-val green';
 
   var hint = cur < 30 ? 'Bei starkem Mangel bitte Blutbild nach 8–12 Wochen kontrollieren. ' : '';
   var seniorHint = age >= 65 ? 'Ab 65 Jahren ist die Hautsynthese deutlich reduziert – regelmäßige Kontrolle empfohlen. ' : '';
@@ -984,9 +1008,9 @@ function doVitDRechner() {
 
 // ── Prompts ──────────────────────────────────────────────────────────────────
 
-var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungsergaenzungsmittel, Homoeopathie und Schuessler-Salze.\n\nWenn nach einem Schuessler-Salz gefragt wird (z.B. Nr. 7 Magnesium phosphoricum, Calcium fluoratum, Natrium muriaticum), gib biochemische Informationen nach Dr. Wilhelm Heinrich Schuessler: Mineralstofftherapie, Wirkprinzip, Anwendungsgebiete und Einnahme als Tabletten (D6 oder D12). Orientiere dich dabei an der Qualitaet und dem Detailgrad von NetDoctor.de (netdoctor.de/naturheilkunde/schuessler-salze/) als medizinische Referenz. Erwaehne NetDoctor.de im Abschnitt Bezugsquellen als weiterfuehrende Informationsquelle. Wenn nach einem homoeopathischen Mittel gefragt wird (z.B. Arnica, Belladonna, Nux vomica, Potenzangabe wie C30), gib homoeopathische Informationen. Bei Nahrungsergaenzungsmitteln (z.B. Magnesium, Vitamin D) gib NEM-Informationen nach aktuellen DGE/EFSA 2021 und NIH 2020 Referenzwerten: Nenne stets konkrete Dosierungsbereiche in IE oder mg, erwaehne Einnahmeform (Tropfen, Kapseln, Tabletten) und Loeslichkeit (fett- oder wasserloeslich) sowie wichtige Synergisten. Passe die Abschnitte entsprechend an.\n\nGib strukturierte Informationen mit exakt diesen Trennzeichen:\n\n###EG###\n[Grobes Einsatzgebiet / Wofuer wird es verwendet – bei NEM: biochemische Funktion im Koerper kurz erlaeutern]\n\n###AW###\n[Spezieller Anwendungsbereich / Typisches Anwendungsbild]\n\n###EI###\n[Einnahmeempfehlungen: Zeitpunkt, Einnahmeform (Tropfen/Kapseln/Tabletten), Loeslichkeit (fett-/wasserloeslich), praktische Tipps]\n\n###DO###\n[Dosierungshinweise: bei NEM konkrete Werte in IE oder mg nach DGE/EFSA/NIH (z.B. Vitamin D3: 1.000–4.000 IE/Tag fuer Erwachsene); bei Homoeopathie: Potenz und Einnahmefrequenz]\n\n###DA###\n[Dauereinnahme oder Kureinnahme empfehlenswert? Begruendung, wann Blutwertkontrolle sinnvoll]\n\n###KQ###\n[Bezugsquellen: Bei homoeopathischen Mitteln und Schuessler-Salzen: DHU – Deutsche Homoeopathie-Union (dhu.de) als fuehrender deutscher Hersteller in Apothekenqualitaet. Ausserdem: Apotheke, Drogerie, Reformhaus; Hinweis auf Qualitaetsmerkmale]\n\n###KO###\n[Wichtige Synergisten und Kombinationen mit Begruendung (z.B. Vitamin D3 + K2 + Magnesium)]\n\nAuf Deutsch, klar, praxisnah und fachlich praezise.';
+var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungsergaenzungsmittel, Homoeopathie und Schuessler-Salze.\n\nWenn nach einem Schuessler-Salz gefragt wird (z.B. Nr. 7 Magnesium phosphoricum, Calcium fluoratum, Natrium muriaticum), gib biochemische Informationen nach Dr. Wilhelm Heinrich Schuessler: Mineralstofftherapie, Wirkprinzip, Anwendungsgebiete und Einnahme als Tabletten (D6 oder D12). Orientiere dich dabei an der Qualitaet und dem Detailgrad von NetDoctor.de (netdoctor.de/naturheilkunde/schuessler-salze/) als medizinische Referenz. Erwaehne NetDoctor.de im Abschnitt Bezugsquellen als weiterfuehrende Informationsquelle. Wenn nach einem homoeopathischen Mittel gefragt wird (z.B. Arnica, Belladonna, Nux vomica, Potenzangabe wie C30), gib homoeopathische Informationen. Bei Nahrungsergaenzungsmitteln (z.B. Magnesium, Vitamin D) gib NEM-Informationen nach aktuellen DGE/EFSA 2021 und NIH 2020 Referenzwerten: Nenne stets konkrete Dosierungsbereiche in IE oder mg, erwaehne Einnahmeform (Tropfen, Kapseln, Tabletten) und Loeslichkeit (fett- oder wasserloeslich) sowie wichtige Synergisten. Passe die Abschnitte entsprechend an.\n\nGib strukturierte Informationen mit exakt diesen Trennzeichen:\n\n###EG###\n[Grobes Einsatzgebiet / Wofuer wird es verwendet – bei NEM: biochemische Funktion im Koerper kurz erlaeutern]\n\n###AW###\n[Spezieller Anwendungsbereich / Typisches Anwendungsbild]\n\n###EI###\n[Einnahmeempfehlungen: Zeitpunkt, Einnahmeform (Tropfen/Kapseln/Tabletten), Loeslichkeit (fett-/wasserloeslich), praktische Tipps]\n\n###DO###\n[Dosierungshinweise: bei NEM konkrete Werte in IE oder mg nach DGE/EFSA/NIH (z.B. Vitamin D3: 1.000–4.000 IE/Tag fuer Erwachsene); bei Homoeopathie: Potenz und Einnahmefrequenz]\n\n###WW###\n[Wechselwirkungen mit Medikamenten und anderen Mitteln: konkrete Wirkstoffgruppen nennen (z.B. Gerinnungshemmer, Antibiotika, Schilddruesenhormone, Blutdrucksenker, Diuretika, hormonelle Verhuetung) und noetige Einnahmeabstaende in Stunden. Hemmende/foerdernde Wechselwirkungen mit Nahrung (z.B. Kaffee, Milch). Wenn keine relevanten bekannt sind, das klar sagen]\n\n###NW###\n[Nebenwirkungen, Anzeichen einer Ueberdosierung und tolerierbare Obergrenze pro Tag (EFSA-UL bzw. BfR-Hoechstmenge fuer NEM, falls vorhanden). Gegenanzeigen: fuer wen ungeeignet oder nur nach Ruecksprache mit Arzt (z.B. Schwangerschaft/Stillzeit, Kinder, Nieren-/Lebererkrankungen, Allergien wie Laktose bei Globuli/Tabletten)]\n\n###DA###\n[Dauereinnahme oder Kureinnahme empfehlenswert? Begruendung, wann Blutwertkontrolle sinnvoll]\n\n###KQ###\n[Bezugsquellen: Bei homoeopathischen Mitteln und Schuessler-Salzen: DHU – Deutsche Homoeopathie-Union (dhu.de) als fuehrender deutscher Hersteller in Apothekenqualitaet. Ausserdem: Apotheke, Drogerie, Reformhaus; Hinweis auf Qualitaetsmerkmale]\n\n###KO###\n[Wichtige Synergisten und Kombinationen mit Begruendung (z.B. Vitamin D3 + K2 + Magnesium)]\n\nAuf Deutsch, klar, praxisnah und fachlich praezise.';
 
-var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde, Homoeopathie und Schuessler-Salze.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme. Hinweis: DHU (dhu.de) ist der fuehrende deutsche Hersteller.]\n\n###SCH###\n[2-3 passende Schuessler-Salze. Fuer jedes: **Nr. X Name (Potenz)** - Biochemisches Wirkprinzip und warum es bei diesen Beschwerden hilft. Orientiere dich an der Qualitaet von NetDoctor.de als Referenz. Hinweis: DHU (dhu.de) ist der fuehrende Hersteller in Deutschland.]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
+var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde, Homoeopathie und Schuessler-Salze.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme. Hinweis: DHU (dhu.de) ist der fuehrende deutsche Hersteller.]\n\n###SCH###\n[2-3 passende Schuessler-Salze. Fuer jedes: **Nr. X Name (Potenz)** - Biochemisches Wirkprinzip und warum es bei diesen Beschwerden hilft. Orientiere dich an der Qualitaet von NetDoctor.de als Referenz. Hinweis: DHU (dhu.de) ist der fuehrende Hersteller in Deutschland.]\n\n###WW###\n[Wechselwirkungen und Gegenanzeigen der oben genannten Mittel: welche Mittel nicht zusammen mit verbreiteten Medikamenten (z.B. Gerinnungshemmer, Antidepressiva, Schilddruesenhormone, Blutdrucksenker, hormonelle Verhuetung) eingenommen werden sollen, noetige Einnahmeabstaende, und fuer wen sie ungeeignet sind (Schwangerschaft/Stillzeit, Kinder, Nieren-/Lebererkrankungen). Mit Arzt oder Apotheke abklaeren, wenn regelmaessig Medikamente eingenommen werden]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
 
 var SYS_I = 'Du bist ein Experte fuer Wechselwirkungen zwischen Nahrungsergaenzungsmitteln, Medikamenten und Supplementen.\n\nDer Nutzer nennt zwei Mittel. Pruefe auf:\n- Bekannte Interaktionen (hemmend, foerdernd, antagonistisch)\n- Sicherheitsrisiken\n- Optimale Einnahmeabstaende\n- Synergien (wenn positiv)\n\nGib strukturierte Infos mit exakt diesen Trennzeichen:\n\n###VE###\n[Vertraeglichkeit: gut/bedingt/vermeiden – kurze Begruendung]\n\n###IN###\n[Bekannte Interaktionen: Was passiert im Koerper, Mechanismus kurz erklaert]\n\n###EM###\n[Empfehlung: Einnahmeabstand, bessere Kombination, Alternativen]\n\nAuf Deutsch, klar und praxisnah. Keine Angst schueren, aber ehrlich sein.';
 
@@ -994,8 +1018,8 @@ var SYS_BL = 'Du bist ein Experte fuer Laborwerte und Nahrungsergaenzungsmittel.
 
 var SYS_CMP = 'Du bist ein Experte fuer Nahrungsergaenzungsmittel.\n\nDer Nutzer vergleicht zwei Supplemente. Gib einen strukturierten Vergleich:\n\n###UG###\n[Uebersicht: Kurze Gegenueberstellung der beiden Mittel]\n\n###WU###\n[Wirkung: Biochemische Wirkungsweise, Aufnahme im Koerper]\n\n###DO###\n[Dosierung: Typische Dosierungsbereiche, Formen]\n\n###PR###\n[Preis/Verfuegbarkeit: Typischer Preis, Bezugsquellen]\n\n###FA###\n[Fazit: Wann ist welches Mittel besser geeignet?]\n\nAuf Deutsch, neutral und faktenbasiert.';
 
-var SS = {'EG':'Einsatzgebiet','AW':'Spezieller Anwendungsbereich','EI':'Einnahmeempfehlungen','DO':'Dosierungshinweise','DA':'Dauereinnahme','KQ':'Kaufquellen','KO':'Kombinationen'};
-var SB = {'UR':'Mögl. Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Homöopathische Mittel','SCH':'Schüßlersalze','LS':'Lebensstil-Tipps','HI':'Wichtiger Hinweis'};
+var SS = {'EG':'Einsatzgebiet','AW':'Spezieller Anwendungsbereich','EI':'Einnahmeempfehlungen','DO':'Dosierungshinweise','WW':'⚠️ Wechselwirkungen','NW':'⚠️ Nebenwirkungen & Gegenanzeigen','DA':'Dauereinnahme','KQ':'Kaufquellen','KO':'Kombinationen'};
+var SB = {'UR':'Mögl. Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Homöopathische Mittel','SCH':'Schüßlersalze','WW':'⚠️ Wechselwirkungen & Gegenanzeigen','LS':'Lebensstil-Tipps','HI':'Wichtiger Hinweis'};
 var SI = {'VE':'Verträglichkeit','IN':'Interaktion','EM':'Empfehlung'};
 var SBL = {'AN':'Analyse','SU':'Supplement-Empfehlung','HI':'Hinweis'};
 var SCMP = {'UG':'Übersicht','WU':'Wirkung','DO':'Dosierung','PR':'Preis/Verfügbarkeit','FA':'Fazit'};
