@@ -139,6 +139,8 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 .grphead.p { color:var(--ptxt); background:var(--pbg); }
 .grphead.b { color:var(--bluetxt); background:var(--bluebg); }
 .grphead.t { color:var(--tealtxt); background:var(--tealbg); }
+.grphead.r { color:var(--redtxt); background:var(--redbg); }
+.grphead.a { color:var(--ambertxt); background:var(--amberbg); }
 .grpcontent { padding:10px 14px; font-size:15px; line-height:1.7; color:var(--text); }
 .grpcontent ul { padding-left:1.2rem; margin-top:4px; }
 .grpcontent li { margin-bottom:3px; }
@@ -281,6 +283,24 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
       <button class="chip cg" onclick="qs('Coenzym Q10')">Q10</button>
       <button class="chip cg" onclick="qs('Eisen')">Eisen</button>
       <button class="chip cg" onclick="qs('Melatonin')">Melatonin</button>
+      <button class="chip cg" onclick="qs('Vitamin K2 MK-7')">Vitamin K2</button>
+      <button class="chip cg" onclick="qs('Folsäure')">Fols&auml;ure</button>
+      <button class="chip cg" onclick="qs('Jod')">Jod</button>
+      <button class="chip cg" onclick="qs('Selen')">Selen</button>
+      <button class="chip cg" onclick="qs('Probiotika')">Probiotika</button>
+      <button class="chip cg" onclick="qs('L-Theanin')">L-Theanin</button>
+      <button class="chip cg" onclick="qs('Kreatin')">Kreatin</button>
+      <div class="slabel" style="width:100%;margin-top:10px;margin-bottom:2px">Heilpflanzen</div>
+      <button class="chip cg" onclick="qs('Baldrian')">Baldrian</button>
+      <button class="chip cg" onclick="qs('Johanniskraut')">Johanniskraut</button>
+      <button class="chip cg" onclick="qs('Kurkuma')">Kurkuma</button>
+      <button class="chip cg" onclick="qs('Ingwer')">Ingwer</button>
+      <button class="chip cg" onclick="qs('Pfefferminzöl')">Pfefferminz&ouml;l</button>
+      <button class="chip cg" onclick="qs('Mönchspfeffer')">M&ouml;nchspfeffer</button>
+      <button class="chip cg" onclick="qs('Mariendistel')">Mariendistel</button>
+      <button class="chip cg" onclick="qs('Echinacea')">Echinacea</button>
+      <button class="chip cg" onclick="qs('Ginkgo')">Ginkgo</button>
+      <button class="chip cg" onclick="qs('Kamille')">Kamille</button>
       <div class="slabel" style="width:100%;margin-top:10px;margin-bottom:2px">Hom&ouml;opathie</div>
       <button class="chip cg" onclick="qs('Arnica montana C30')">Arnica C30</button>
       <button class="chip cg" onclick="qs('Belladonna C30')">Belladonna C30</button>
@@ -561,12 +581,12 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 
 <div class="rcard" id="rcDHU">
   <div class="rhead t">
-    <div class="rname t">DHU &ndash; Deutsche Hom&ouml;opathie-Union</div>
-    <div class="rbadge rbt">Hersteller</div>
+    <div class="rname t">Bezugsquelle</div>
+    <div class="rbadge rbt">Hinweis</div>
   </div>
   <div class="rbody">
     <div class="rsec">
-      <div class="rscontent"><strong>DHU</strong> ist der f&uuml;hrende deutsche Hersteller f&uuml;r hom&ouml;opathische Mittel und Sch&uuml;&szlig;lersalze &ndash; von Globuli &uuml;ber Tabletten bis zu Komplexmitteln in Apothekenqualit&auml;t.<br><br><a href="https://www.dhu.de" target="_blank" rel="noopener">Produkte auf dhu.de ansehen &rarr;</a></div>
+      <div class="rscontent">Hom&ouml;opathische Mittel und Sch&uuml;&szlig;lersalze sind als Arzneimittel <strong>in der Apotheke</strong> erh&auml;ltlich (vor Ort oder Versandapotheke) und werden in Deutschland von mehreren Herstellern angeboten.<br><br>Beim Kauf auf <strong>Potenz</strong> (z.B. D6, D12, C30), <strong>Darreichungsform</strong> (Globuli, Tabletten, Tropfen) und <strong>Hilfsstoffe</strong> achten &ndash; Tabletten enthalten meist Laktose, Tropfen oft Alkohol.</div>
     </div>
   </div>
 </div>
@@ -666,8 +686,11 @@ var HOMOEO_POTENCY = /\b([CcDdQqLlMm][0-9]+|[CcDdQqLlMm][0-9]+[Mm]?|[Mm][Kk]-?[0
 var HOMOEO_NAMES = ['arnica','belladonna','nux vomica','chamomilla','apis mellifica','bryonia','rhus tox','pulsatilla','calcarea','lycopodium','sulfur','sulphur','sepia','ignatia','lachesis','arsenicum','aconitum','gelsemium','hepar sulph','mercurius','natrum mur','silicea','staphysagria','thuja'];
 var SCHUESSLERSALZ_NAMES = ['schüßlersalz','schuessler','calcium fluoratum','calcium phosphoricum','ferrum phosphoricum','kalium chloratum','kalium phosphoricum','kalium sulfuricum','magnesium phosphoricum','natrium chloratum','natrium phosphoricum','natrium sulfuricum','calcium sulfuricum'];
 
+// NEM-Namen, die wie eine Potenz aussehen (D3, Q10, MK-7)
+var NOT_POTENCY = /vitamin|vit\.?\s|coenzym|q10|mk-?7/i;
+
 function isHomeopathic(q) {
-  if (HOMOEO_POTENCY.test(q)) return true;
+  if (HOMOEO_POTENCY.test(q) && !NOT_POTENCY.test(q)) return true;
   for (var i = 0; i < HOMOEO_NAMES.length; i++) {
     if (q.indexOf(HOMOEO_NAMES[i]) !== -1) return true;
   }
@@ -720,25 +743,82 @@ function fmtBfr(d) {
   return fmtVal(d.bfr.v, d.unit, d.ie);
 }
 
+// ── KI-Kontext: Profil + Referenzwerte der App ────────────────────────────────
+function profileLabel() {
+  var p = userProfile;
+  var who = p.ageGroup === '1-10' || p.ageGroup === '11-17' ? (p.gender === 'm' ? 'Junge' : 'Mädchen') : (p.gender === 'm' ? 'Mann' : 'Frau');
+  var sp = p.special === 'schwanger' ? ', schwanger' : p.special === 'stillend' ? ', stillend' : '';
+  return who + ', ' + p.ageGroup + ' Jahre' + sp;
+}
+
+function profileContext() {
+  if (!userProfile.isSet) return '';
+  return '\n\nNutzerprofil: ' + profileLabel() + '. Passe Dosierungen, Warnhinweise und Gegenanzeigen an dieses Profil an ' +
+         '(z.B. Kinderdosis, Schwangerschaft/Stillzeit, Senioren) und weise ausdruecklich darauf hin, wenn ein Mittel fuer dieses Profil ungeeignet ist.';
+}
+
+function refContext(nutKey) {
+  var d = EFSA[nutKey];
+  if (!d) return '';
+  var p = userProfile, bedarf;
+  if (p.isSet) {
+    bedarf = profileLabel() + ' ' + fmtVal(getVal(d.eu, p.ageGroup, p.gender, p.special), d.unit, d.ie);
+  } else {
+    bedarf = 'Maenner ' + fmtVal(getVal(d.eu, '18-64', 'm', 'none'), d.unit, d.ie) +
+             ', Frauen ' + fmtVal(getVal(d.eu, '18-64', 'f', 'none'), d.unit, d.ie);
+  }
+  var t = '\n\nReferenzwerte dieser App fuer ' + d.de + ' (werden dem Nutzer daneben angezeigt – nicht widersprechen): ' +
+          'Tagesbedarf (DGE): ' + bedarf + '.';
+  if (d.bfr && p.ageGroup !== '1-10') t += ' BfR-Hoechstmenge pro Tagesdosis eines NEM: ' + fmtBfr(d) + (d.bfr.note ? ' (' + d.bfr.note + ')' : '') + '.';
+  if (d.ul) t += ' EFSA-Obergrenze (UL, Erwachsene, alle Quellen): ' + fmtVal(d.ul.v, d.unit, d.ie) + (d.ul.note ? ' (' + d.ul.note + ')' : '') + '.';
+  return t + ' Verwende diese Zahlen in den Abschnitten Dosierung und Nebenwirkungen. Hoehere therapeutische Dosen nur mit Begruendung und Hinweis auf aerztliche Begleitung nennen.';
+}
+
+// ── Gute Lebensmittelquellen (deutsch) ────────────────────────────────────────
+var FOOD_DE = {
+  'vit-a':    'Leber, Süßkartoffeln, Karotten, Grünkohl (als Beta-Carotin)',
+  'vit-b1':   'Schweinefleisch, Haferflocken, Sonnenblumenkerne, Hülsenfrüchte',
+  'vit-b2':   'Milch und Milchprodukte, Eier, Champignons, Mandeln',
+  'vit-b3':   'Geflügel, Thunfisch, Erdnüsse, Vollkornprodukte',
+  'vit-b5':   'Leber, Eier, Pilze, Avocado',
+  'vit-b6':   'Hähnchen, Lachs, Kichererbsen, Bananen',
+  'vit-b7':   'Eigelb, Haferflocken, Nüsse, Sojabohnen',
+  'vit-b9':   'Spinat, Linsen, Grünkohl, Brokkoli',
+  'vit-b12':  'Leber, Fisch, Fleisch, Milchprodukte, Eier (pflanzlich praktisch keine)',
+  'vit-c':    'Paprika, Brokkoli, schwarze Johannisbeeren, Zitrusfrüchte',
+  'vit-d':    'Hering, Lachs, Eier, UV-belichtete Pilze – Hauptquelle ist Sonnenlicht',
+  'vit-e':    'Weizenkeimöl, Sonnenblumenkerne, Mandeln, Haselnüsse',
+  'vit-k':    'Grünkohl, Spinat, Brokkoli; K2: Sauerkraut, Käse, Natto',
+  'calcium':  'Hartkäse, calciumreiches Mineralwasser (> 150 mg/l), Grünkohl, Sesam',
+  'magnesium':'Kürbiskerne, Haferflocken, Mandeln, Vollkornprodukte',
+  'eisen':    'Fleisch, Leber, Linsen, Haferflocken – pflanzlich zusammen mit Vitamin C',
+  'zink':     'Austern, Rindfleisch, Kürbiskerne, Haferflocken',
+  'jod':      'Seefisch, Jodsalz, Milchprodukte',
+  'selen':    'Paranüsse, Fisch, Eier',
+  'kalium':   'Kartoffeln, Bananen, Hülsenfrüchte, Trockenobst',
+  'phosphor': 'Käse, Fleisch, Hülsenfrüchte, Nüsse',
+  'omega3':   'Hering, Makrele, Lachs, Algenöl (vegan); ALA: Leinöl, Walnüsse'
+};
+
 // ── USDA FoodData Central ──────────────────────────────────────────────────────
 // Maps nutrient key to a representative food search term + USDA nutrient ID
 var USDA_QUERY = {
-  'magnesium': { q:'almonds',         nid:1090, unit:'mg' },
-  'calcium':   { q:'parmesan',        nid:1087, unit:'mg' },
-  'eisen':     { q:'chicken liver',   nid:1089, unit:'mg' },
-  'zink':      { q:'oyster',          nid:1095, unit:'mg' },
-  'jod':       { q:'cod fish',        nid:1100, unit:'μg' },
-  'selen':     { q:'brazil nuts',     nid:1103, unit:'μg' },
-  'kalium':    { q:'potato',          nid:1092, unit:'mg' },
-  'vit-a':     { q:'sweet potato',    nid:1106, unit:'μg' },
-  'vit-b12':   { q:'beef liver',      nid:1178, unit:'μg' },
-  'vit-b9':    { q:'spinach',         nid:1177, unit:'μg' },
-  'vit-c':     { q:'bell pepper red', nid:1162, unit:'mg' },
-  'vit-d':     { q:'salmon',          nid:1114, unit:'μg' },
-  'vit-e':     { q:'sunflower seeds', nid:1109, unit:'mg' },
-  'vit-k':     { q:'kale',            nid:1185, unit:'μg' },
-  'omega3':    { q:'salmon atlantic', nid:1316, unit:'g'  },
-  'phosphor':  { q:'parmesan',        nid:1091, unit:'mg' },
+  'magnesium': { q:'almonds',         de:'Mandeln', nid:1090, unit:'mg' },
+  'calcium':   { q:'parmesan',        de:'Parmesan', nid:1087, unit:'mg' },
+  'eisen':     { q:'chicken liver',   de:'Hühnerleber', nid:1089, unit:'mg' },
+  'zink':      { q:'oyster',          de:'Austern', nid:1095, unit:'mg' },
+  'jod':       { q:'cod fish',        de:'Kabeljau', nid:1100, unit:'μg' },
+  'selen':     { q:'brazil nuts',     de:'Paranüsse', nid:1103, unit:'μg' },
+  'kalium':    { q:'potato',          de:'Kartoffeln', nid:1092, unit:'mg' },
+  'vit-a':     { q:'sweet potato',    de:'Süßkartoffeln', nid:1106, unit:'μg' },
+  'vit-b12':   { q:'beef liver',      de:'Rinderleber', nid:1178, unit:'μg' },
+  'vit-b9':    { q:'spinach',         de:'Spinat', nid:1177, unit:'μg' },
+  'vit-c':     { q:'bell pepper red', de:'rote Paprika', nid:1162, unit:'mg' },
+  'vit-d':     { q:'salmon',          de:'Lachs', nid:1114, unit:'μg' },
+  'vit-e':     { q:'sunflower seeds', de:'Sonnenblumenkerne', nid:1109, unit:'mg' },
+  'vit-k':     { q:'kale',            de:'Grünkohl', nid:1185, unit:'μg' },
+  'omega3':    { q:'salmon atlantic', de:'Atlantiklachs', nid:1316, unit:'g'  },
+  'phosphor':  { q:'parmesan',        de:'Parmesan', nid:1091, unit:'mg' },
 };
 
 async function callUSDA(nutKey) {
@@ -763,7 +843,7 @@ async function callUSDA(nutKey) {
         if (ns[ni].nutrientId === info.nid) { nut = ns[ni]; break; }
       }
       if (nut && nut.value) {
-        return { food: food.description, value: nut.value, unit: nut.unitName || info.unit };
+        return { food: info.de, value: nut.value, unit: nut.unitName || info.unit };
       }
     }
     return null;
@@ -827,10 +907,14 @@ function renderReferenzwerte(nutKey, usdaResult) {
 
   // USDA food source
   var usdaDiv = document.getElementById('refUsda');
-  if (usdaResult) {
-    var rawVal = parseFloat(usdaResult.value);
-    var dispVal = isNaN(rawVal) ? usdaResult.value : (rawVal < 1 ? rawVal.toFixed(2) : Math.round(rawVal));
-    usdaDiv.innerHTML = '<div class="ref-usda"><span class="ref-usda-icon">🌿</span><span class="ref-usda-text">Natürliche Quelle (USDA): <strong>' + usdaResult.food + '</strong> enthält <strong>' + dispVal + ' ' + usdaResult.unit + '</strong> pro 100g &mdash; Quelle: USDA FoodData Central</span></div>';
+  if (FOOD_DE[nutKey] || usdaResult) {
+    var foodText = FOOD_DE[nutKey] ? 'Gute Lebensmittelquellen: <strong>' + FOOD_DE[nutKey] + '</strong>' : '';
+    if (usdaResult) {
+      var rawVal = parseFloat(usdaResult.value);
+      var dispVal = isNaN(rawVal) ? usdaResult.value : (rawVal < 1 ? rawVal.toFixed(2).replace('.', ',') : Math.round(rawVal));
+      foodText += (foodText ? '<br>' : '') + 'Beispiel ' + usdaResult.food + ': ca. <strong>' + dispVal + ' ' + usdaResult.unit + '</strong> pro 100 g (USDA FoodData Central)';
+    }
+    usdaDiv.innerHTML = '<div class="ref-usda"><span class="ref-usda-icon">🌿</span><span class="ref-usda-text">' + foodText + '</span></div>';
     usdaDiv.style.display = 'block';
   } else {
     usdaDiv.style.display = 'none';
@@ -1006,9 +1090,9 @@ function doVitDRechner() {
 
 // ── Prompts ──────────────────────────────────────────────────────────────────
 
-var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungsergaenzungsmittel, Homoeopathie und Schuessler-Salze.\n\nWenn nach einem Schuessler-Salz gefragt wird (z.B. Nr. 7 Magnesium phosphoricum, Calcium fluoratum, Natrium muriaticum), gib biochemische Informationen nach Dr. Wilhelm Heinrich Schuessler: Mineralstofftherapie, Wirkprinzip, Anwendungsgebiete und Einnahme als Tabletten (D6 oder D12). Orientiere dich dabei an der Qualitaet und dem Detailgrad von NetDoctor.de (netdoctor.de/naturheilkunde/schuessler-salze/) als medizinische Referenz. Erwaehne NetDoctor.de im Abschnitt Bezugsquellen als weiterfuehrende Informationsquelle. Wenn nach einem homoeopathischen Mittel gefragt wird (z.B. Arnica, Belladonna, Nux vomica, Potenzangabe wie C30), gib homoeopathische Informationen. Bei Nahrungsergaenzungsmitteln (z.B. Magnesium, Vitamin D) gib NEM-Informationen nach aktuellen DGE/EFSA 2021 und NIH 2020 Referenzwerten: Nenne stets konkrete Dosierungsbereiche in IE oder mg, erwaehne Einnahmeform (Tropfen, Kapseln, Tabletten) und Loeslichkeit (fett- oder wasserloeslich) sowie wichtige Synergisten. Passe die Abschnitte entsprechend an.\n\nGib strukturierte Informationen mit exakt diesen Trennzeichen:\n\n###EG###\n[Grobes Einsatzgebiet / Wofuer wird es verwendet – bei NEM: biochemische Funktion im Koerper kurz erlaeutern]\n\n###AW###\n[Spezieller Anwendungsbereich / Typisches Anwendungsbild]\n\n###EI###\n[Einnahmeempfehlungen: Zeitpunkt, Einnahmeform (Tropfen/Kapseln/Tabletten), Loeslichkeit (fett-/wasserloeslich), praktische Tipps]\n\n###DO###\n[Dosierungshinweise: bei NEM konkrete Werte in IE oder mg nach DGE/EFSA/NIH (z.B. Vitamin D3: 1.000–4.000 IE/Tag fuer Erwachsene); bei Homoeopathie: Potenz und Einnahmefrequenz]\n\n###WW###\n[Wechselwirkungen mit Medikamenten und anderen Mitteln: konkrete Wirkstoffgruppen nennen (z.B. Gerinnungshemmer, Antibiotika, Schilddruesenhormone, Blutdrucksenker, Diuretika, hormonelle Verhuetung) und noetige Einnahmeabstaende in Stunden. Hemmende/foerdernde Wechselwirkungen mit Nahrung (z.B. Kaffee, Milch). Wenn keine relevanten bekannt sind, das klar sagen]\n\n###NW###\n[Nebenwirkungen, Anzeichen einer Ueberdosierung und tolerierbare Obergrenze pro Tag (EFSA-UL bzw. BfR-Hoechstmenge fuer NEM, falls vorhanden). Gegenanzeigen: fuer wen ungeeignet oder nur nach Ruecksprache mit Arzt (z.B. Schwangerschaft/Stillzeit, Kinder, Nieren-/Lebererkrankungen, Allergien wie Laktose bei Globuli/Tabletten)]\n\n###DA###\n[Dauereinnahme oder Kureinnahme empfehlenswert? Begruendung, wann Blutwertkontrolle sinnvoll]\n\n###KQ###\n[Bezugsquellen: Bei homoeopathischen Mitteln und Schuessler-Salzen: DHU – Deutsche Homoeopathie-Union (dhu.de) als fuehrender deutscher Hersteller in Apothekenqualitaet. Ausserdem: Apotheke, Drogerie, Reformhaus; Hinweis auf Qualitaetsmerkmale]\n\n###KO###\n[Wichtige Synergisten und Kombinationen mit Begruendung (z.B. Vitamin D3 + K2 + Magnesium)]\n\nAuf Deutsch, klar, praxisnah und fachlich praezise.';
+var SYS_S = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Nahrungsergaenzungsmittel, Homoeopathie und Schuessler-Salze.\n\nWenn nach einem Schuessler-Salz gefragt wird (z.B. Nr. 7 Magnesium phosphoricum, Calcium fluoratum, Natrium muriaticum), gib biochemische Informationen nach Dr. Wilhelm Heinrich Schuessler: Mineralstofftherapie, Wirkprinzip, Anwendungsgebiete und Einnahme als Tabletten (D6 oder D12). Wenn nach einem homoeopathischen Mittel gefragt wird (z.B. Arnica, Belladonna, Nux vomica, Potenzangabe wie C30), gib homoeopathische Informationen. Wenn nach einer Heilpflanze gefragt wird (Phytotherapie, z.B. Baldrian, Johanniskraut, Kurkuma, Ingwer), gib phytotherapeutische Informationen: wirksamkeitsbestimmende Inhaltsstoffe, Zubereitungsform (Tee, Tinktur, Trockenextrakt mit Droge-Extrakt-Verhaeltnis), Einstufung durch die EMA/HMPC (well-established use oder traditional use) bzw. Kommission E, und ob es zugelassene Arzneimittel aus der Apotheke gibt (meist besser standardisiert als NEM). Bei Nahrungsergaenzungsmitteln (z.B. Magnesium, Vitamin D) gib NEM-Informationen nach aktuellen DGE/EFSA 2021 und NIH 2020 Referenzwerten: Nenne stets konkrete Dosierungsbereiche in IE oder mg, erwaehne Einnahmeform (Tropfen, Kapseln, Tabletten) und Loeslichkeit (fett- oder wasserloeslich) sowie wichtige Synergisten. Passe die Abschnitte entsprechend an.\n\nGib strukturierte Informationen mit exakt diesen Trennzeichen:\n\n###EG###\n[Grobes Einsatzgebiet / Wofuer wird es verwendet – bei NEM: biochemische Funktion im Koerper kurz erlaeutern]\n\n###AW###\n[Spezieller Anwendungsbereich / Typisches Anwendungsbild]\n\n###EV###\n[Studienlage ehrlich bewerten, erste Zeile genau eine Bewertung: ⭐⭐⭐ = durch Studien gut belegt (z.B. Meta-Analysen, zugelassener EFSA-Health-Claim) · ⭐⭐ = erste Hinweise aus Studien · ⭐ = traditionelle Anwendung/Erfahrungsheilkunde, Wirksamkeit ueber Placebo hinaus nicht belegt. Danach 1-3 Saetze: wofuer es Belege gibt und wofuer nicht; zugelassene EFSA-Health-Claims woertlich nennen, falls vorhanden. Keine Heilversprechen in allen Abschnitten – bei ⭐ z.B. \'wird traditionell eingesetzt bei\' statt \'hilft gegen\']\n\n###EI###\n[Einnahmeempfehlungen: Zeitpunkt, Einnahmeform (Tropfen/Kapseln/Tabletten), Loeslichkeit (fett-/wasserloeslich), praktische Tipps]\n\n###DO###\n[Dosierungshinweise: bei NEM konkrete Werte in IE oder mg nach DGE/EFSA/NIH (z.B. Vitamin D3: 1.000–4.000 IE/Tag fuer Erwachsene); bei Homoeopathie: Potenz und Einnahmefrequenz]\n\n###WW###\n[Wechselwirkungen mit Medikamenten und anderen Mitteln: konkrete Wirkstoffgruppen nennen (z.B. Gerinnungshemmer, Antibiotika, Schilddruesenhormone, Blutdrucksenker, Diuretika, hormonelle Verhuetung) und noetige Einnahmeabstaende in Stunden. Hemmende/foerdernde Wechselwirkungen mit Nahrung (z.B. Kaffee, Milch). Wenn keine relevanten bekannt sind, das klar sagen]\n\n###NW###\n[Nebenwirkungen, Anzeichen einer Ueberdosierung und tolerierbare Obergrenze pro Tag (EFSA-UL bzw. BfR-Hoechstmenge fuer NEM, falls vorhanden). Gegenanzeigen: fuer wen ungeeignet oder nur nach Ruecksprache mit Arzt (z.B. Schwangerschaft/Stillzeit, Kinder, Nieren-/Lebererkrankungen, Allergien wie Laktose bei Globuli/Tabletten)]\n\n###DA###\n[Dauereinnahme oder Kureinnahme empfehlenswert? Begruendung, wann Blutwertkontrolle sinnvoll]\n\n###KQ###\n[Bezugsquellen: Apotheke, Versandapotheke, Drogerie, Reformhaus. Herstellerneutral bleiben – keine Marke hervorheben oder als fuehrend bezeichnen; falls Hersteller genannt werden, mehrere gleichrangig. Qualitaetsmerkmale nennen (z.B. Arzneimittelzulassung/Apothekenpflicht, standardisierter Extrakt bei Heilpflanzen, Hilfsstoffe wie Laktose, unabhaengige Laborpruefung bei NEM)]\n\n###KO###\n[Wichtige Synergisten und Kombinationen mit Begruendung (z.B. Vitamin D3 + K2 + Magnesium)]\n\nAuf Deutsch, klar, praxisnah und fachlich praezise.';
 
-var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde, Homoeopathie und Schuessler-Salze.\n\nDer Nutzer beschreibt Beschwerden. Gib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[4-5 Nahrungsergaenzungsmittel oder Naturprodukte. Fuer jedes: **Name** - Warum es hilft, Dosierung]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** - Anwendungsbild, Einnahme. Hinweis: DHU (dhu.de) ist der fuehrende deutsche Hersteller.]\n\n###SCH###\n[2-3 passende Schuessler-Salze. Fuer jedes: **Nr. X Name (Potenz)** - Biochemisches Wirkprinzip und warum es bei diesen Beschwerden hilft. Orientiere dich an der Qualitaet von NetDoctor.de als Referenz. Hinweis: DHU (dhu.de) ist der fuehrende Hersteller in Deutschland.]\n\n###WW###\n[Wechselwirkungen und Gegenanzeigen der oben genannten Mittel: welche Mittel nicht zusammen mit verbreiteten Medikamenten (z.B. Gerinnungshemmer, Antidepressiva, Schilddruesenhormone, Blutdrucksenker, hormonelle Verhuetung) eingenommen werden sollen, noetige Einnahmeabstaende, und fuer wen sie ungeeignet sind (Schwangerschaft/Stillzeit, Kinder, Nieren-/Lebererkrankungen). Mit Arzt oder Apotheke abklaeren, wenn regelmaessig Medikamente eingenommen werden]\n\n###LS###\n[3 Lebensstil-Tipps]\n\n###HI###\n[Wann zum Arzt? Kurzer Sicherheitshinweis]\n\nAuf Deutsch, verstaendlich und praktisch.';
+var SYS_B = 'Du bist ein erfahrener Experte fuer ganzheitliche Medizin, Naturheilkunde, Homoeopathie und Schuessler-Salze.\n\nDer Nutzer beschreibt Beschwerden. Bewerte bei jedem empfohlenen Mittel ehrlich die Studienlage: ⭐⭐⭐ = durch Studien gut belegt (z.B. Meta-Analysen, zugelassener EFSA-Health-Claim) · ⭐⭐ = erste Hinweise aus Studien · ⭐ = traditionelle Anwendung/Erfahrungsheilkunde, Wirksamkeit ueber Placebo hinaus nicht belegt. Formuliere keine Heilversprechen – bei ⭐ z.B. \'wird traditionell eingesetzt bei\' statt \'hilft gegen\'. Nenne keine Marken oder Hersteller.\n\nGib unterstuetzende Empfehlungen mit exakt diesen Trennzeichen:\n\n###HI###\n[Wann sofort oder zeitnah zum Arzt: 2-4 konkrete Warnsignale fuer genau diese Beschwerden (z.B. bei Kopfschmerzen: ploetzlich staerkster Kopfschmerz, Laehmung/Sehstoerung, Fieber mit Nackensteifigkeit). Gehoeren die Beschwerden grundsaetzlich in aerztliche Abklaerung oder Behandlung (z.B. Bluthochdruck, Brustschmerz, anhaltende Niedergeschlagenheit), das als ersten Satz deutlich sagen und alle folgenden Mittel nur als Ergaenzung zur aerztlichen Behandlung darstellen – verordnete Medikamente nie eigenmaechtig absetzen. Kurz, 2-4 Saetze oder Stichpunkte]\n\n###UR###\n[Moegliche Ursachen kurz erklaert]\n\n###NEM###\n[3-4 Nahrungsergaenzungsmittel (Vitamine, Mineralstoffe, sonstige NEM – Heilpflanzen gehoeren in den naechsten Abschnitt). Fuer jedes: **Name** (Studienlage ⭐–⭐⭐⭐) - Wofuer es eingesetzt wird, Dosierung]\n\n###PHY###\n[2-3 Heilpflanzen (Phytotherapie). Fuer jedes: **Pflanze (Zubereitung, z.B. Tee oder Trockenextrakt)** (Studienlage ⭐–⭐⭐⭐) - Wofuer sie eingesetzt wird, Dosierung, EMA/HMPC-Einstufung (well-established oder traditional use)]\n\n###HOM###\n[4 homoeopathische Mittel. Fuer jedes: **Mittelname (Potenz)** (Studienlage ⭐–⭐⭐⭐) - Anwendungsbild nach homoeopathischer Lehre, Einnahme.]\n\n###SCH###\n[2-3 passende Schuessler-Salze. Fuer jedes: **Nr. X Name (Potenz)** (Studienlage ⭐–⭐⭐⭐) - Wirkprinzip nach Schuessler und wofuer es bei diesen Beschwerden eingesetzt wird.]\n\n###WW###\n[Wechselwirkungen und Gegenanzeigen der oben genannten Mittel: welche Mittel nicht zusammen mit verbreiteten Medikamenten (z.B. Gerinnungshemmer, Antidepressiva, Schilddruesenhormone, Blutdrucksenker, hormonelle Verhuetung) eingenommen werden sollen, noetige Einnahmeabstaende, und fuer wen sie ungeeignet sind (Schwangerschaft/Stillzeit, Kinder, Nieren-/Lebererkrankungen). Mit Arzt oder Apotheke abklaeren, wenn regelmaessig Medikamente eingenommen werden]\n\n###LS###\n[3 Lebensstil-Tipps]\n\nAuf Deutsch, verstaendlich und praktisch.';
 
 var SYS_I = 'Du bist ein Experte fuer Wechselwirkungen zwischen Nahrungsergaenzungsmitteln, Medikamenten und Supplementen.\n\nDer Nutzer nennt zwei Mittel. Pruefe auf:\n- Bekannte Interaktionen (hemmend, foerdernd, antagonistisch)\n- Sicherheitsrisiken\n- Optimale Einnahmeabstaende\n- Synergien (wenn positiv)\n\nGib strukturierte Infos mit exakt diesen Trennzeichen:\n\n###VE###\n[Vertraeglichkeit: gut/bedingt/vermeiden – kurze Begruendung]\n\n###IN###\n[Bekannte Interaktionen: Was passiert im Koerper, Mechanismus kurz erklaert]\n\n###EM###\n[Empfehlung: Einnahmeabstand, bessere Kombination, Alternativen]\n\nAuf Deutsch, klar und praxisnah. Keine Angst schueren, aber ehrlich sein.';
 
@@ -1016,8 +1100,8 @@ var SYS_BL = 'Du bist ein Experte fuer Laborwerte und Nahrungsergaenzungsmittel.
 
 var SYS_CMP = 'Du bist ein Experte fuer Nahrungsergaenzungsmittel.\n\nDer Nutzer vergleicht zwei Supplemente. Gib einen strukturierten Vergleich:\n\n###UG###\n[Uebersicht: Kurze Gegenueberstellung der beiden Mittel]\n\n###WU###\n[Wirkung: Biochemische Wirkungsweise, Aufnahme im Koerper]\n\n###DO###\n[Dosierung: Typische Dosierungsbereiche, Formen]\n\n###PR###\n[Preis/Verfuegbarkeit: Typischer Preis, Bezugsquellen]\n\n###FA###\n[Fazit: Wann ist welches Mittel besser geeignet?]\n\nAuf Deutsch, neutral und faktenbasiert.';
 
-var SS = {'EG':'Einsatzgebiet','AW':'Spezieller Anwendungsbereich','EI':'Einnahmeempfehlungen','DO':'Dosierungshinweise','WW':'⚠️ Wechselwirkungen','NW':'⚠️ Nebenwirkungen & Gegenanzeigen','DA':'Dauereinnahme','KQ':'Kaufquellen','KO':'Kombinationen'};
-var SB = {'UR':'Mögl. Ursachen','NEM':'Supplements & Naturprodukte','HOM':'Homöopathische Mittel','SCH':'Schüßlersalze','WW':'⚠️ Wechselwirkungen & Gegenanzeigen','LS':'Lebensstil-Tipps','HI':'Wichtiger Hinweis'};
+var SS = {'EG':'Einsatzgebiet','AW':'Spezieller Anwendungsbereich','EV':'Studienlage','EI':'Einnahmeempfehlungen','DO':'Dosierungshinweise','WW':'⚠️ Wechselwirkungen','NW':'⚠️ Nebenwirkungen & Gegenanzeigen','DA':'Dauereinnahme','KQ':'Kaufquellen','KO':'Kombinationen'};
+var SB = {'HI':'Wann zum Arzt?','UR':'Mögl. Ursachen','NEM':'Supplements','PHY':'Heilpflanzen','HOM':'Homöopathische Mittel','SCH':'Schüßlersalze','WW':'⚠️ Wechselwirkungen & Gegenanzeigen','LS':'Lebensstil-Tipps'};
 var SI = {'VE':'Verträglichkeit','IN':'Interaktion','EM':'Empfehlung'};
 var SBL = {'AN':'Analyse','SU':'Supplement-Empfehlung','HI':'Hinweis'};
 var SCMP = {'UG':'Übersicht','WU':'Wirkung','DO':'Dosierung','PR':'Preis/Verfügbarkeit','FA':'Fazit'};
@@ -1178,8 +1262,12 @@ function renderB(complaint, text) {
   for (var i = 0; i < secs.length; i++) {
     var s = secs[i];
     if (i > 0) h += '<div class="div"></div>';
-    if (s.k === 'NEM') {
-      h += '<div class="grphead g">&#x1F4CA; Supplements &amp; Naturprodukte</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+    if (s.k === 'HI') {
+      h += '<div class="grphead r">&#x1F6A8; Wann zum Arzt?</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+    } else if (s.k === 'NEM') {
+      h += '<div class="grphead g">&#x1F4CA; Supplements</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+    } else if (s.k === 'PHY') {
+      h += '<div class="grphead a">&#x1F33F; Heilpflanzen</div><div class="grpcontent">'+fmt(s.c)+'</div>';
     } else if (s.k === 'HOM') {
       h += '<div class="grphead p">&#x2697;&#xFE0F; Hom&ouml;opathische Mittel</div><div class="grpcontent">'+fmt(s.c)+'</div>';
     } else if (s.k === 'SCH') {
@@ -1245,7 +1333,7 @@ async function doSupplement() {
 
   try {
     // Run LLM call and USDA call in parallel
-    var llmPromise = callAPI(SYS_S, 'Ganzheitsmedizin-Mittel: ' + v);
+    var llmPromise = callAPI(SYS_S, 'Ganzheitsmedizin-Mittel: ' + v + (nutKey ? refContext(nutKey) : '') + profileContext());
     var usdaPromise = nutKey ? callUSDA(nutKey) : Promise.resolve(null);
 
     var t = await llmPromise;
@@ -1271,7 +1359,7 @@ async function doSymptom() {
   document.getElementById('bbtn').disabled = true;
   startLoad('Suche Empfehlungen...');
   try {
-    var t = await callAPI(SYS_B, 'Meine Beschwerden: ' + v);
+    var t = await callAPI(SYS_B, 'Meine Beschwerden: ' + v + profileContext());
     renderB(v, t);
     document.getElementById('btnnew').classList.add('on');
     setTimeout(function(){ document.getElementById('rcB').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
@@ -1294,7 +1382,7 @@ async function doInteraction() {
   if (!a || !b) { document.getElementById(a ? 'intB' : 'intA').focus(); return; }
   startLoad('Prüfe Interaktion: ' + a + ' + ' + b + '...');
   try {
-    var t = await callAPI(SYS_I, 'Mittel 1: ' + a + '\nMittel 2: ' + b);
+    var t = await callAPI(SYS_I, 'Mittel 1: ' + a + '\nMittel 2: ' + b + profileContext());
     renderI(a, b, t);
     document.getElementById('btnnew').classList.add('on');
     setTimeout(function(){ document.getElementById('rcI').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
@@ -1332,7 +1420,7 @@ async function doBlood() {
   if (tsh) vals.push('TSH: ' + tsh + ' mIU/L');
   startLoad('Analysiere Blutwerte...');
   try {
-    var t = await callAPI(SYS_BL, 'Blutwerte:\n' + vals.join('\n'));
+    var t = await callAPI(SYS_BL, 'Blutwerte:\n' + vals.join('\n') + profileContext());
     renderBL(t);
     document.getElementById('btnnew').classList.add('on');
     setTimeout(function(){ document.getElementById('blResult').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
@@ -1358,7 +1446,9 @@ async function doCompare() {
   if (!a || !b) { document.getElementById(a ? 'cmpB' : 'cmpA').focus(); return; }
   startLoad('Vergleiche: ' + a + ' vs ' + b + '...');
   try {
-    var t = await callAPI(SYS_CMP, 'Vergleich: ' + a + ' vs ' + b);
+    var t = await callAPI(SYS_CMP, 'Vergleich: ' + a + ' vs ' + b +
+      (matchNutrient(a) ? refContext(matchNutrient(a)) : '') +
+      (matchNutrient(b) && matchNutrient(b) !== matchNutrient(a) ? refContext(matchNutrient(b)) : '') + profileContext());
     renderCMP(a, b, t);
     document.getElementById('btnnew').classList.add('on');
     setTimeout(function(){ document.getElementById('cmpResult').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
