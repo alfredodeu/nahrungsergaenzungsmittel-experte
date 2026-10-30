@@ -716,6 +716,7 @@ function fmtVal(v, unit, ie) {
 function fmtBfr(d) {
   if (!d.bfr) return '–';
   if (d.bfr.none) return 'keine nötig';
+  if (d.bfr.v === 0) return 'nicht empfohlen';
   return fmtVal(d.bfr.v, d.unit, d.ie);
 }
 
