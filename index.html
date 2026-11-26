@@ -250,6 +250,19 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
   <p>Supplements, Hom&ouml;opathie, Sch&uuml;&szlig;lersalze &amp; Naturheilkunde</p>
 </div>
 
+<!-- Für wen? (Mensch / Haustier) -->
+<div class="toggle">
+  <button class="tbtn ag" id="spM" onclick="setSpecies('mensch')">&#x1F9D1; Mensch</button>
+  <button class="tbtn" id="spK" onclick="setSpecies('katze')">&#x1F431; Katze</button>
+  <button class="tbtn" id="spH" onclick="setSpecies('hund')">&#x1F436; Hund</button>
+</div>
+<div class="card" id="petWeightCard" style="display:none;margin-bottom:12px">
+  <div class="rcalc-field">
+    <label>Gewicht des Tieres in kg (f&uuml;r die Dosierung)</label>
+    <input type="number" id="petWeight" min="0.5" max="100" step="0.1" placeholder="z.B. 4,5"/>
+  </div>
+</div>
+
 <!-- Premium Toggle -->
 <div class="api-selector" style="display:none">
   <div class="api-label">Premium-Modus</div>
@@ -272,7 +285,21 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
       <button class="btn bg bi" id="sbtn" onclick="doSupplement()">Suchen</button>
     </div>
     <div class="slabel">Schnellauswahl</div>
-    <div class="chips">
+    <div class="chips" id="chipsPetS" style="display:none">
+      <button class="chip cg" onclick="qs('Taurin')">Taurin</button>
+      <button class="chip cg" onclick="qs('Omega-3 Fischöl')">Omega-3</button>
+      <button class="chip cg" data-sp="katze" onclick="qs('L-Lysin')">L-Lysin</button>
+      <button class="chip cg" data-sp="katze" onclick="qs('Malzpaste')">Malzpaste</button>
+      <button class="chip cg" onclick="qs('Bierhefe')">Bierhefe</button>
+      <button class="chip cg" onclick="qs('Probiotika')">Probiotika</button>
+      <button class="chip cg" onclick="qs('Grünlippmuschel')">Gr&uuml;nlippmuschel</button>
+      <button class="chip cg" data-sp="hund" onclick="qs('Teufelskralle')">Teufelskralle</button>
+      <button class="chip cg" onclick="qs('Glucosamin')">Glucosamin</button>
+      <button class="chip cg" onclick="qs('Arnica montana C30')">Arnica C30</button>
+      <button class="chip cg" onclick="qs('Knoblauch')">Knoblauch?</button>
+      <button class="chip cg" onclick="qs('Teebaumöl')">Teebaum&ouml;l?</button>
+    </div>
+    <div class="chips" id="chipsHumanS">
       <button class="chip cg" onclick="qs('Magnesium')">Magnesium</button>
       <button class="chip cg" onclick="qs('Vitamin D3')">Vitamin D3</button>
       <button class="chip cg" onclick="qs('Omega-3')">Omega-3</button>
@@ -346,7 +373,18 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
   </div>
   <div class="card" style="padding-top:12px">
     <div class="slabel">H&auml;ufige Beschwerden</div>
-    <div class="chips">
+    <div class="chips" id="chipsPetB" style="display:none">
+      <button class="chip cp" data-sp="katze" onclick="qb('Haarballen und Erbrechen')">Haarballen</button>
+      <button class="chip cp" onclick="qb('Gelenkprobleme Arthrose im Alter')">Gelenke</button>
+      <button class="chip cp" onclick="qb('Stumpfes Fell, Juckreiz, Hautprobleme')">Fell &amp; Haut</button>
+      <button class="chip cp" onclick="qb('Durchfall und Verdauungsprobleme')">Verdauung</button>
+      <button class="chip cp" onclick="qb('Stress und Angst, z.B. Silvester oder Umzug')">Stress &amp; Angst</button>
+      <button class="chip cp" data-sp="katze" onclick="qb('Nierenprobleme bei aelterer Katze')">Nieren</button>
+      <button class="chip cp" onclick="qb('Zecken und Floehe vorbeugen')">Zecken &amp; Fl&ouml;he</button>
+      <button class="chip cp" onclick="qb('Appetitlosigkeit')">Appetit</button>
+      <button class="chip cp" onclick="qb('Immunsystem staerken')">Immunsystem</button>
+    </div>
+    <div class="chips" id="chipsHumanB">
       <button class="chip cp" onclick="qb('Kopfschmerzen')">Kopfschmerzen</button>
       <button class="chip cp" onclick="qb('Schlafprobleme')">Schlafprobleme</button>
       <button class="chip cp" onclick="qb('Muedigkeit und Erschoepfung')">M&uuml;digkeit</button>
@@ -615,6 +653,26 @@ var mode = 's';
 var provider = 'gemini';
 var PROXY_URL = 'https://nem-proxy.alfredodeu.workers.dev';
 var premiumMode = false;
+var species = 'mensch';
+
+// ── Mensch / Haustier ──────────────────────────────────────────────────────────
+function setSpecies(s) {
+  if (s !== species) document.getElementById('petWeight').value = '';
+  species = s;
+  var pet = s !== 'mensch';
+  document.getElementById('spM').className = s === 'mensch' ? 'tbtn ag' : 'tbtn';
+  document.getElementById('spK').className = s === 'katze' ? 'tbtn ag' : 'tbtn';
+  document.getElementById('spH').className = s === 'hund' ? 'tbtn ag' : 'tbtn';
+  document.getElementById('petWeightCard').style.display = pet ? '' : 'none';
+  document.getElementById('chipsPetS').style.display = pet ? '' : 'none';
+  document.getElementById('chipsPetB').style.display = pet ? '' : 'none';
+  document.getElementById('chipsHumanS').style.display = pet ? 'none' : '';
+  document.getElementById('chipsHumanB').style.display = pet ? 'none' : '';
+  document.querySelectorAll('[data-sp]').forEach(function(el){ el.style.display = el.getAttribute('data-sp') === s ? '' : 'none'; });
+  // Rechner (Tagesbedarf + Blutwerte) gilt nur fuer Menschen
+  document.getElementById('btnR').style.display = pet ? 'none' : '';
+  setMode(pet && mode === 'r' ? 's' : mode);
+}
 
 // ── User Profile (for personalized reference values) ──────────────────────────
 var userProfile = { ageGroup: '18-64', gender: 'f', special: 'none', isSet: false };
@@ -749,13 +807,32 @@ function profileLabel() {
   return who + ', ' + p.ageGroup + ' Jahre' + sp;
 }
 
+function petContext() {
+  var katze = species === 'katze';
+  var kg = parseFloat(String(document.getElementById('petWeight').value || '').replace(',', '.'));
+  var w = kg > 0 ? ', ' + String(kg).replace('.', ',') + ' kg Koerpergewicht' : ' (Gewicht unbekannt)';
+  var gift = katze
+    ? 'aetherische Oele wie Teebaum- oder Pfefferminzoel, Paracetamol, Ibuprofen/ASS, Salicylate (z.B. Weidenrinde), Knoblauch/Zwiebel, Lilien, Alpha-Liponsaeure, Vitamin D in Humandosis'
+    : 'Xylit, Knoblauch/Zwiebel, Weintrauben/Rosinen, Schokolade/Theobromin, Macadamia, Paracetamol, Ibuprofen, Alpha-Liponsaeure, Vitamin D in Humandosis';
+  return '\n\nWICHTIG - TIER STATT MENSCH: Die Anfrage betrifft ' + (katze ? 'eine Katze' : 'einen Hund') + w + '. ' +
+    'Ignoriere alle Vorgaben zu menschlichen Referenzwerten (DGE/EFSA/BfR/NIH), Schwangerschaft, Kindern und Humanmedikamenten und antworte ausschliesslich tiermedizinisch fuer ' + (katze ? 'Katzen' : 'Hunde') + ', in denselben Abschnitten mit denselben Trennzeichen:\n' +
+    '- Ist ein Mittel fuer ' + (katze ? 'Katzen' : 'Hunde') + ' giftig oder ungeeignet (z.B. ' + gift + '), sage das gleich im ersten Abschnitt deutlich mit ⚠️ und nenne KEINE Dosierung.\n' +
+    '- Dosierungen nur pro kg Koerpergewicht' + (kg > 0 ? ' und zusaetzlich umgerechnet fuer dieses Tier' : '') + ', nach tiermedizinischen Quellen. Humanpraeparate nur nach Ruecksprache mit dem Tierarzt (Hilfsstoffe, Aromen, Dosisstaerke).\n' +
+    '- Statt Arzt immer Tierarzt; Warnsignale fuer einen Tierarztbesuch tierartspezifisch nennen.\n' +
+    '- Wechselwirkungen mit gaengigen Tierarzneimitteln (z.B. Schmerzmittel wie Meloxicam, Kortison, Antiparasitika).\n' +
+    '- Bezugsquellen: Tierarzt, Tierapotheke, Fachhandel fuer Tierbedarf; herstellerneutral.\n' +
+    '- Homoeopathie und Schuessler-Salze duerfen genannt werden, aber mit ehrlicher Studienlage (fuer Tiere meist ⭐) und nie als Ersatz fuer eine tieraerztliche Behandlung.';
+}
+
 function profileContext() {
+  if (species !== 'mensch') return petContext();
   if (!userProfile.isSet) return '';
   return '\n\nNutzerprofil: ' + profileLabel() + '. Passe Dosierungen, Warnhinweise und Gegenanzeigen an dieses Profil an ' +
          '(z.B. Kinderdosis, Schwangerschaft/Stillzeit, Senioren) und weise ausdruecklich darauf hin, wenn ein Mittel fuer dieses Profil ungeeignet ist.';
 }
 
 function refContext(nutKey) {
+  if (species !== 'mensch') return '';
   var d = EFSA[nutKey];
   if (!d) return '';
   var p = userProfile, bedarf;
@@ -1244,7 +1321,7 @@ function renderB(complaint, text) {
     var s = secs[i];
     if (i > 0) h += '<div class="div"></div>';
     if (s.k === 'HI') {
-      h += '<div class="grphead r">&#x1F6A8; Wann zum Arzt?</div><div class="grpcontent">'+fmt(s.c)+'</div>';
+      h += '<div class="grphead r">&#x1F6A8; Wann zum ' + (species === 'mensch' ? 'Arzt' : 'Tierarzt') + '?</div><div class="grpcontent">'+fmt(s.c)+'</div>';
     } else if (s.k === 'NEM') {
       h += '<div class="grphead g">&#x1F4CA; Supplements</div><div class="grpcontent">'+fmt(s.c)+'</div>';
     } else if (s.k === 'PHY') {
@@ -1310,7 +1387,7 @@ async function doSupplement() {
   startLoad('Analysiere ' + v + '...');
 
   // Detect nutrient for reference values
-  var nutKey = matchNutrient(v);
+  var nutKey = species === 'mensch' ? matchNutrient(v) : null;
 
   try {
     // Run LLM call and USDA call in parallel
