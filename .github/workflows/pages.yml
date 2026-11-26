@@ -18,9 +18,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      - name: Nur Seitendateien bereitstellen
+        run: |
+          mkdir _site
+          cp index.html nahrungsergaenzungsmittel-experte.html _site/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
       - id: deployment
         uses: actions/deploy-pages@v4
         # Das frisch hochgeladene Artefakt ist manchmal noch nicht abrufbar ("No artifacts named github-pages")
