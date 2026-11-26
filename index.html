@@ -613,9 +613,7 @@ input::placeholder,textarea::placeholder { color:var(--text3); }
 <script>
 var mode = 's';
 var provider = 'gemini';
-var GEMINI_DEFAULT_KEY = '%%GEMINI_API_KEY%%';
-var USDA_DEFAULT_KEY = '%%USDA_API_KEY%%';
-var GROQ_DEFAULT_KEY = '%%GROQ_API_KEY%%';
+var PROXY_URL = 'https://nem-proxy.alfredodeu.workers.dev';
 var premiumMode = false;
 
 // ── User Profile (for personalized reference values) ──────────────────────────
@@ -824,11 +822,7 @@ var USDA_QUERY = {
 async function callUSDA(nutKey) {
   var info = USDA_QUERY[nutKey];
   if (!info) return null;
-  var key = (USDA_DEFAULT_KEY.indexOf('%') === -1 ? USDA_DEFAULT_KEY : '') || 'DEMO_KEY';
-  var url = 'https://api.nal.usda.gov/fdc/v1/foods/search?query=' +
-    encodeURIComponent(info.q) +
-    '&dataType=Foundation,SR%20Legacy&pageSize=3&api_key=' +
-    encodeURIComponent(key);
+  var url = PROXY_URL + '/usda?q=' + encodeURIComponent(info.q);
   try {
     var r = await fetch(url);
     if (!r.ok) return null;
@@ -1165,14 +1159,7 @@ document.getElementById('sinp').addEventListener('keydown', function(e){ if(e.ke
 // ── API Calls ─────────────────────────────────────────────────────────────────
 
 async function callGemini(sys, msg) {
-  var key = (GEMINI_DEFAULT_KEY.indexOf('%') === -1 ? GEMINI_DEFAULT_KEY : '') || getKey('gemini');
-  if (!key) throw new Error('NOKEY_GEMINI');
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + key;
-  var body = {
-    system_instruction: { parts: [{ text: sys }] },
-    contents: [{ role: 'user', parts: [{ text: msg }] }]
-  };
-  var r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  var r = await fetch(PROXY_URL + '/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sys: sys, msg: msg }) });
   if (!r.ok) {
     var err = await r.json().catch(function(){ return {}; });
     var msg2 = (err.error && err.error.message) ? err.error.message : 'Status ' + r.status;
@@ -1183,16 +1170,10 @@ async function callGemini(sys, msg) {
 }
 
 async function callGroq(sys, msg) {
-  var key = (GROQ_DEFAULT_KEY.indexOf('%') === -1 ? GROQ_DEFAULT_KEY : '');
-  if (!key) throw new Error('NOKEY_GROQ');
-  var r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  var r = await fetch(PROXY_URL + '/groq', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      max_tokens: 2500,
-      messages: [{ role: 'system', content: sys }, { role: 'user', content: msg }]
-    })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sys: sys, msg: msg })
   });
   if (!r.ok) {
     var err = await r.json().catch(function(){ return {}; });
