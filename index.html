@@ -1276,6 +1276,10 @@ function providerLabel() {
 
 function parseSec(text, map) {
   var keys = Object.keys(map), res = [];
+  // Abweichende Marker der KI (z.B. "### UG", "## UG", "### UG ###") vereinheitlichen, "---"-Trennlinien entfernen
+  text = text
+    .replace(new RegExp('^[ \\t]*#{2,3}[ \\t]*(' + keys.join('|') + ')[ \\t]*#{0,3}[ \\t]*$', 'gm'), '###$1###')
+    .replace(/^[ \t]*-{3,}[ \t]*$/gm, '');
   for (var i = 0; i < keys.length; i++) {
     var k = keys[i];
     var si = text.indexOf('###'+k+'###');
